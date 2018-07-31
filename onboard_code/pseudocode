@@ -13,15 +13,15 @@ function loop():
 	altitude = calculate_altitude()
 
 	# Linear actuator 1
-	if altitude > HEIGHT_1_START and altitude < HEIGHT_1_END:
+	if altitude > HEIGHT_1_START AND altitude < HEIGHT_1_END:
 		power_linear_actuator(LIN_ACTUATOR_1, 'EXTEND')
 
-	elif altitude > HEIGHT_1_END and altitude < HEIGHT_2_START:
+	elif altitude > HEIGHT_1_END AND altitude < HEIGHT_2_START:
 		power_linear_actuator(LIN_ACTUATOR_1, 'RETRACT' )
 
 
 	# Linear actuator 2
-	elif altitude > HEIGHT_2_START and altitude < HEIGHT_2_END:
+	elif altitude > HEIGHT_2_START AND altitude < HEIGHT_2_END:
 		power_linear_actuator(LIN_ACTUATOR_2, 'EXTEND' )
 
 	elif altitude > HEIGHT_2_END:
