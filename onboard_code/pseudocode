@@ -24,7 +24,7 @@ function loop():
 	elif altitude > HEIGHT_2_START and altitude < HEIGHT_2_END:
 		power_linear_actuator(LIN_ACTUATOR_2, 'EXTEND' )
 
-	elif altitude > HEIGHT_1_END:
+	elif altitude > HEIGHT_2_END:
 		power_linear_actuator(LIN_ACTUATOR_2, 'RETRACT' )
 		
 		
