@@ -1,0 +1,49 @@
+# This file is pseudocode for the arduino onboard the balloon. 
+# It controls when to extend the arms holding the samples to expose to the environment 
+# for collection, based on altitude.
+# This pseudocode mirros arduino .ino file with the setup() and loop() function
+
+
+function setup():
+	linear_actuator('RETRACT')  # retract just in case (might not be needed?)
+
+
+function loop():
+	# get altitude
+	altitude = calculate_altitude()
+
+	# Linear actuator 1
+	if altitude > HEIGHT_1_START AND altitude < HEIGHT_1_END:
+		power_linear_actuator(LIN_ACTUATOR_1, 'EXTEND')
+
+	elif altitude > HEIGHT_1_END AND altitude < HEIGHT_2_START:
+		power_linear_actuator(LIN_ACTUATOR_1, 'RETRACT' )
+
+
+	# Linear actuator 2
+	elif altitude > HEIGHT_2_START AND altitude < HEIGHT_2_END:
+		power_linear_actuator(LIN_ACTUATOR_2, 'EXTEND' )
+
+	elif altitude > HEIGHT_2_END:
+		power_linear_actuator(LIN_ACTUATOR_2, 'RETRACT' )
+		
+		
+
+function calculate_altitude():
+	""" Gets the altimeter output, then converts it to an altitude using a set formula """
+
+	pressure, temperature = get_altimeter_data()  # get raw data
+	altitude = altitude_formula(pressure, temperature)  # convert to altitude
+
+	return altitude
+
+
+function power_linear_actuator(which_actuator, status):
+	""" Powers a given linear actuator to either retract or extend """
+
+	if status == 'EXTEND':
+		# TODO: power for x seconds until fully extended
+	
+	elif status == 'RETRACT'
+		# TODO: power for x seconds until fully retracted
+	
