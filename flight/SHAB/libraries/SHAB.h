@@ -1,5 +1,5 @@
 /*
-  SHAB.ino runs two linear actuators based on altitude
+  SHAB.h contains all declarations for SHAB
   Copyright (C) 2018  Alex Hyer
  
   This file is part of SHAB.
@@ -18,20 +18,17 @@
   along with SHAB.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <Arduino.h>
-#include "libraries/SHAB.h"
+#ifndef SHAB_SHAB_H_
+#define SHAB_SHAB_H_
 
-void setup() {
-  // put your setup code here, to run once:  
-  pinMode(SDA, INPUT);  // This line may not be needed
-  pinMode(SCL, OUTPUT);  // This line may not be needed
+class LinearActuator {
+  private:
+    bool extended = false;
+    int fpin, rpin;
+    
+  public:
+    LinearActuator (int f, int r);
+    bool get_extended();
+};
 
-  Serial.begin(115200);
-}
-
-void loop() {
-  // put your main code here, to run repeatedly:
-  if (Serial.available() > 0) {
-    Serial.println(Serial.read());
-  }
-}
+#endif // SHAB_SHAB_H_
