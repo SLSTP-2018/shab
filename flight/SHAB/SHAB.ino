@@ -22,11 +22,23 @@
 #define SHAB_SHAB_ino_  // Define if not defined previously
 
 class LinearActuator {
-  
-} tla, sla;
+  private:
+    bool extended = false;
+    int fpin, rpin;
+    
+  public:
+    LinearActuator (int f, int r);
+    bool get_extended();
+};
 
-// tla = Troposphere Linear Actuator
-// sla = Stratosphere Linear Actuator
+LinearActuator::LinearActuator (int f, int r){
+  fpin = f;
+  rpin = r;
+}
+
+bool LinearActuator::get_extended(){
+  return extended;
+}
 
 void setup() {
   // put your setup code here, to run once:  
@@ -43,4 +55,4 @@ void loop() {
   }
 }
 
-#endif // SHAB_SHAB_ino_vv
+#endif // SHAB_SHAB_ino_
