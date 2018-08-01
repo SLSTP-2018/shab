@@ -18,9 +18,6 @@
   along with SHAB.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef SHAB_SHAB_ino_  // Prevent multiple inclusion
-#define SHAB_SHAB_ino_  // Define if not defined previously
-
 class LinearActuator {
   private:
     bool extended = false;
@@ -54,5 +51,3 @@ void loop() {
     Serial.println(Serial.read());
   }
 }
-
-#endif // SHAB_SHAB_ino_
