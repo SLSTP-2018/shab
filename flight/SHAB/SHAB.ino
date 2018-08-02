@@ -19,10 +19,9 @@
  */
 
 #include <Arduino.h>
-#include "libraries/SHAB.h"
-#include "libraries/MS5xxx.h"
+#include "SHAB.h"
+#include "MS5xxx.h"
 #include <Wire.h>
-
 
 MS5xxx sensor(&Wire);
 
