@@ -78,7 +78,5 @@ void powerLinearActuator(boolean useLinAct1, boolean isExtend){
   // if isExtend, we already have the correct pin. if retract, it's the next pin
   pin = isExtend ? pin : pin + 1;
   // perform the pin action
-  //DigitalWrite(pin, HIGH);
+  DigitalWrite(pin, HIGH);
   delay(LA_POWER_MILLISECONDS);
-}
-
