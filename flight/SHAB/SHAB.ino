@@ -21,6 +21,15 @@
 #include <Arduino.h>
 #include "libraries/SHAB.h"
 
+// the pins must be next to each other for the powerLinearActuator to work
+int LA_1_EXTEND_PIN = 2;
+int LA_1_RETRACT_PIN = 3;
+int LA_2_EXTEND_PIN = 4;
+int LA_2_RETRACT_PIN = 5;
+
+// time to power the linear actuator to fully perform its extend or retract action
+int LA_POWER_MILLISECONDS = 5000;
+
 void setup() {
   // put your setup code here, to run once:  
   pinMode(SDA, INPUT);  // This line may not be needed
@@ -35,3 +44,14 @@ void loop() {
     Serial.println(Serial.read());
   }
 }
+
+void powerLinearActuator(boolean useLinAct1, boolean isExtend){
+  // choose which pin to use
+  int pin = useLinAct1 ? LA_1_EXTEND_PIN : LA_2_EXTEND_PIN;
+  // if isExtend, we already have the correct pin. if retract, it's the next pin
+  pin = isExtend ? pin : pin + 1;
+  // perform the pin action
+  DigitalWrite(pin, HIGH);
+  delay(LA_POWER_MILLISECONDS);
+}
+
