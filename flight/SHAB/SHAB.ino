@@ -1,6 +1,6 @@
 /*
   SHAB.ino runs two linear actuators based on altitude
-  Copyright (C) 2018  Alex Hyer
+  Copyright (C) 2018  Alex Hyer, Andrew Jong
  
   This file is part of SHAB.
 
@@ -19,8 +19,8 @@
  */
 
 #include <Arduino.h>
-#include "SHAB.h"
 #include "MS5xxx.h"
+#include "SHAB.h"
 #include <Wire.h>
 
 MS5xxx sensor(&Wire);
@@ -42,7 +42,7 @@ void setup() {
     Serial.println("Error connecting...");
     delay(500);
     setup();
-}
+  }
 }
 
 void loop() {
