@@ -31,4 +31,6 @@ class LinearActuator {
     bool get_extended();
 };
 
+double PascalToMeter(double  pressurePa);
+
 #endif // SHAB_SHAB_H_

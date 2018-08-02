@@ -37,24 +37,28 @@ int LA_POWER_MILLISECONDS = 5000;
 void setup() {
   // put your setup code here, to run once: 
   Serial.begin(9600);
+  pinMode(10, OUTPUT);
 
   if(sensor.connect()>0) {
+    digitalWrite(10, HIGH);
     Serial.println("Error connecting...");
     delay(500);
     setup();
   }
+  digitalWrite(10, LOW);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
   sensor.ReadProm();
   sensor.Readout();
-  Serial.print("Temperature [0.01 C]: ");
-  Serial.println(sensor.GetTemp());
-  Serial.print("Pressure [Pa]: ");
-  Serial.println(sensor.GetPres());
-  test_crc();
-  Serial.println("---");
+  //Serial.print("Temperature [0.01 C]: ");
+  //Serial.println(sensor.GetTemp());
+  //Serial.print("Pressure [Pa]: ");
+  //Serial.println(sensor.GetPres());
+  //test_crc();
+  Serial.println(PascalToMeter(sensor.GetPres()));
+  //Serial.println("---");
   delay(500);
 }
 
