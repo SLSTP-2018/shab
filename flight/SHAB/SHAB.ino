@@ -20,6 +20,11 @@
 
 #include <Arduino.h>
 #include "libraries/SHAB.h"
+#include "libraries/MS5xxx.h"
+#include <Wire.h>
+
+
+MS5xxx sensor(&Wire);
 
 // the pins must be next to each other for the powerLinearActuator to work
 int LA_1_EXTEND_PIN = 2;
@@ -31,18 +36,40 @@ int LA_2_RETRACT_PIN = 5;
 int LA_POWER_MILLISECONDS = 5000;
 
 void setup() {
-  // put your setup code here, to run once:  
-  pinMode(SDA, INPUT);  // This line may not be needed
-  pinMode(SCL, OUTPUT);  // This line may not be needed
+  // put your setup code here, to run once: 
+  Serial.begin(9600);
 
-  Serial.begin(115200);
+  if(sensor.connect()>0) {
+    Serial.println("Error connecting...");
+    delay(500);
+    setup();
+}
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  if (Serial.available() > 0) {
-    Serial.println(Serial.read());
-  }
+  sensor.ReadProm();
+  sensor.Readout();
+  Serial.print("Temperature [0.01 C]: ");
+  Serial.println(sensor.GetTemp());
+  Serial.print("Pressure [Pa]: ");
+  Serial.println(sensor.GetPres());
+  test_crc();
+  Serial.println("---");
+  delay(500);
+}
+
+void test_crc() {
+  sensor.ReadProm();
+  sensor.Readout(); 
+  Serial.print("CRC=0x");
+  Serial.print(sensor.Calc_CRC4(), HEX);
+  Serial.print(" (should be 0x");
+  Serial.print(sensor.Read_CRC4(), HEX);
+  Serial.print(")\n");
+  Serial.print("Test Code CRC=0x");
+  Serial.print(sensor.CRCcodeTest(), HEX);
+  Serial.println(" (should be 0xB)");
 }
 
 void powerLinearActuator(boolean useLinAct1, boolean isExtend){
@@ -51,7 +78,7 @@ void powerLinearActuator(boolean useLinAct1, boolean isExtend){
   // if isExtend, we already have the correct pin. if retract, it's the next pin
   pin = isExtend ? pin : pin + 1;
   // perform the pin action
-  DigitalWrite(pin, HIGH);
+  //DigitalWrite(pin, HIGH);
   delay(LA_POWER_MILLISECONDS);
 }
 

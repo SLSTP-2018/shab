@@ -1,6 +1,6 @@
 /*
   LinearActuator.cpp defines LinearActuator class implementation details
-  Copyright (C) 2018  Alex Hyer
+  Copyright (C) 2018  Alex Hyer, Andrew Jong
  
   This file is part of SHAB.
 

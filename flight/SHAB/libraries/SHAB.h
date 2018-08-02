@@ -1,6 +1,6 @@
 /*
-  SHAB.h contains all declarations for SHAB
-  Copyright (C) 2018  Alex Hyer
+  SHAB.h contains all declarations for in-house SHAB code
+  Copyright (C) 2018  Alex Hyer, Andrew Jong
  
   This file is part of SHAB.
 
