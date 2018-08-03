@@ -30,7 +30,7 @@ LinearActuator::LinearActuator (int f, int r) {
 }
 
 void LinearActuator::extend() {
-  if(extended == false and has_extened == false) {
+  if(extended == false and has_extended == false) {
     digitalWrite(fpin, HIGH);
     digitalWrite(rpin, LOW);
 
@@ -40,7 +40,7 @@ void LinearActuator::extend() {
     digitalWrite(rpin, LOW);
 
     extended = true;
-    has_extened = true;
+    has_extended = true;
   };
 }
 
