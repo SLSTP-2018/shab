@@ -28,14 +28,14 @@ MS5xxx sensor(&Wire);
 
 // Altitude Ranges
 const int tropo_lower = 8;
-const int tropo_upper = 12;
-const int strato_lower = 24;
-const int strato_upper = 30;
+const int tropo_upper = 10;
+const int strato_lower = 15;
+const int strato_upper = 20;
 
 // Intitialize LinearActuators
 // Pin Order: fpin, rpin
-LinearActuator tropo (3, 4);
-LinearActuator strato (8, 9);
+LinearActuator tropo (4, 3);
+LinearActuator strato (9, 8);
 
 //Error LED pins
 const int alt_com_err = 10;  // Altimeter Communications Error
