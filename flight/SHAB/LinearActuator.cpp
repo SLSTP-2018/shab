@@ -62,7 +62,7 @@ void LinearActuator::retract() {
   };
 }
 
-void LinearActuator::test() {
+void LinearActuator::self_test() {
   extend();
   delay(3000);
   retract();

@@ -54,8 +54,8 @@ void setup() {
   flashErrorLEDs(err_leds, 3000);
 
   // Run actuator tests
-  tropo.test();
-  strato.test();
+  tropo.self_test();
+  strato.self_test();
 
   // See if altimeter is responding with CRC
   if(sensor.connect() > 0) {
