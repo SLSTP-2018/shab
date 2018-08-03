@@ -34,35 +34,39 @@ LinearActuator::LinearActuator (int f1, int f2, int r1, int r2){
 }
 
 void LinearActuator::extend(){
-  digitalWrite(fb_pin, HIGH);
-  digitalWrite(fa_pin, HIGH);
-  digitalWrite(rb_pin, LOW);
-  digitalWrite(ra_pin, LOW);
+  if(extended == false) {
+    digitalWrite(fb_pin, HIGH);
+    digitalWrite(fa_pin, HIGH);
+    digitalWrite(rb_pin, LOW);
+    digitalWrite(ra_pin, LOW);
 
-  delay(10000);
+    delay(10000);
 
-  digitalWrite(fb_pin, LOW);
-  digitalWrite(fa_pin, LOW);
-  digitalWrite(rb_pin, LOW);
-  digitalWrite(ra_pin, LOW);
+    digitalWrite(fb_pin, LOW);
+    digitalWrite(fa_pin, LOW);
+    digitalWrite(rb_pin, LOW);
+    digitalWrite(ra_pin, LOW);
 
-  extended = true;
+    extended = true;
+  };
 }
 
 void LinearActuator::retract(){
-  digitalWrite(fb_pin, LOW);
-  digitalWrite(fa_pin, LOW);
-  digitalWrite(rb_pin, HIGH);
-  digitalWrite(ra_pin, HIGH);
+  if(extended == true) {
+    digitalWrite(fb_pin, LOW);
+    digitalWrite(fa_pin, LOW);
+    digitalWrite(rb_pin, HIGH);
+    digitalWrite(ra_pin, HIGH);
 
-  delay(10000);
+    delay(10000);
 
-  digitalWrite(fb_pin, LOW);
-  digitalWrite(fa_pin, LOW);
-  digitalWrite(rb_pin, LOW);
-  digitalWrite(ra_pin, LOW);
+    digitalWrite(fb_pin, LOW);
+    digitalWrite(fa_pin, LOW);
+    digitalWrite(rb_pin, LOW);
+    digitalWrite(ra_pin, LOW);
 
-  extended = false;
+    extended = false;
+  };
 }
 
 bool LinearActuator::get_extended(){

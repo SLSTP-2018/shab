@@ -21,6 +21,8 @@
 #ifndef SHAB_SHAB_H_
 #define SHAB_SHAB_H_
 
+#include "MS5xxx.h"
+
 class LinearActuator {
   private:
     bool extended = false;

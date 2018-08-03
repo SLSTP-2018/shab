@@ -25,6 +25,16 @@
 
 MS5xxx sensor(&Wire);
 
+// Altitude Ranges
+const int tropo_lower = 8;
+const int tropo_upper = 12;
+const int strato_lower = 24;
+const int strato_upper = 30;
+
+// Declare global variables for actuators
+extern LinearActuator tropo;
+extern LinearActuator strato;
+
 void setup() {
   // put your setup code here, to run once: 
   Serial.begin(9600);
@@ -62,15 +72,27 @@ void loop() {
   // put your main code here, to run repeatedly:
   sensor.ReadProm();
   sensor.Readout();
-  int altitude = PascalToMeter(sensor.GetPres());
+  
+  double altitude = PascalToMeter(sensor.GetPres());
+
+  if(altitude >= tropo_lower and altitude <= tropo_upper) {
+      tropo.extend();
+      strato.retract();
+  } else if(altitude >= strato_lower and altitude <= strato_upper) {
+      tropo.retract();
+      strato.extend();
+  } else{
+    tropo.retract();
+    strato.retract();
+  };
 }
 
-void powerLinearActuator(boolean useLinAct1, boolean isExtend){
+//void powerLinearActuator(boolean useLinAct1, boolean isExtend){
   // choose which pin to use
-  int pin = useLinAct1 ? LA_1_EXTEND_PIN : LA_2_EXTEND_PIN;
+//  int pin = useLinAct1 ? LA_1_EXTEND_PIN : LA_2_EXTEND_PIN;
   // if isExtend, we already have the correct pin. if retract, it's the next pin
-  pin = isExtend ? pin : pin + 1;
+//  pin = isExtend ? pin : pin + 1;
   // perform the pin action
-  digitalWrite(pin, HIGH);
-  delay(LA_POWER_MILLISECONDS);
-}
+//  digitalWrite(pin, HIGH);
+//  delay(LA_POWER_MILLISECONDS);
+//}
