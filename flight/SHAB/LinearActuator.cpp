@@ -21,31 +21,23 @@
 #include <Arduino.h>
 #include "SHAB.h"
 
-LinearActuator::LinearActuator (int f1, int f2, int r1, int r2){
-  int fb_pin = f1;  // Forward Before Pin
-  int fa_pin = f2;  // Forward After Pin
-  int rb_pin = r1;  // Reverse Before Pin
-  int ra_pin = r2;  // Reverse After Pin
+LinearActuator::LinearActuator (int f, int r){
+  int fpin = f;  // Forward Pin
+  int rpin = r;  // Reverse Pin
 
-  pinMode(fb_pin, OUTPUT);
-  pinMode(fa_pin, OUTPUT);
-  pinMode(rb_pin, OUTPUT);
-  pinMode(ra_pin, OUTPUT);
+  pinMode(fpin, OUTPUT);
+  pinMode(rpin, OUTPUT);
 }
 
 void LinearActuator::extend(){
   if(extended == false) {
-    digitalWrite(fb_pin, HIGH);
-    digitalWrite(fa_pin, HIGH);
-    digitalWrite(rb_pin, LOW);
-    digitalWrite(ra_pin, LOW);
+    digitalWrite(fpin, HIGH);
+    digitalWrite(rpin, LOW);
 
     delay(10000);
 
-    digitalWrite(fb_pin, LOW);
-    digitalWrite(fa_pin, LOW);
-    digitalWrite(rb_pin, LOW);
-    digitalWrite(ra_pin, LOW);
+    digitalWrite(fpin, LOW);
+    digitalWrite(rpin, LOW);
 
     extended = true;
   };
@@ -53,17 +45,13 @@ void LinearActuator::extend(){
 
 void LinearActuator::retract(){
   if(extended == true) {
-    digitalWrite(fb_pin, LOW);
-    digitalWrite(fa_pin, LOW);
-    digitalWrite(rb_pin, HIGH);
-    digitalWrite(ra_pin, HIGH);
+    digitalWrite(fpin, LOW);
+    digitalWrite(rpin, HIGH);
 
     delay(10000);
 
-    digitalWrite(fb_pin, LOW);
-    digitalWrite(fa_pin, LOW);
-    digitalWrite(rb_pin, LOW);
-    digitalWrite(ra_pin, LOW);
+    digitalWrite(fpin, LOW);
+    digitalWrite(rpin, LOW);
 
     extended = false;
   };

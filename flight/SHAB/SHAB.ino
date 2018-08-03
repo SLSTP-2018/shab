@@ -21,6 +21,7 @@
 #include <Arduino.h>
 #include "MS5xxx.h"
 #include "SHAB.h"
+#include <SoftwareSerial.h>
 #include <Wire.h>
 
 MS5xxx sensor(&Wire);
@@ -35,17 +36,26 @@ const int strato_upper = 30;
 extern LinearActuator tropo;
 extern LinearActuator strato;
 
+//Error LED pins
+const int alt_com_err = 10;  // Altimeter Communications Error
+const int alt_crc_err = 11;  // Altimeter CRC Error
+int err_leds [2] = {alt_com_err, alt_crc_err};  // Array of error LEDs
+
 void setup() {
   // put your setup code here, to run once: 
   Serial.begin(9600);
 
   // Intitialize LinearActuators
-  LinearActuator tropo (2, 3, 4, 5);
-  LinearActuator strato (8, 9, 10, 11);
+  // Pin Order: fb_pin, fa_pin, rb_pin, ra_pin
+  LinearActuator tropo (3, 4);
+  LinearActuator strato (8, 9);
 
   // Retract arms in case they are extended
   tropo.retract();
   strato.retract();
+
+  //Light all error LEDs to ensure function
+  flashErrorLEDs(err_leds, 3000);
 
   // Run actuator tests
   tropo.extend();
@@ -58,18 +68,33 @@ void setup() {
 
   // See if altimeter is responding with CRC
   if(sensor.connect() > 0) {
+    digitalWrite(alt_com_err, HIGH);
     Serial.println("Error connecting...");
     delay(500);
     setup();
   } else if(CRC_Valid(sensor) == false) {
+    digitalWrite(alt_crc_err, HIGH);
     Serial.println("CRC failure...");
     delay(500);
     setup();
   }
+
+  // Turn off error LEDs
+  digitalWrite(alt_com_err, LOW);
+  digitalWrite(alt_crc_err, LOW);
+
+  // Flash Error LEDs to signal end of setup
+  flashErrorLEDs(err_leds, 250);
+  delay(250);
+  flashErrorLEDs(err_leds, 250);
+  delay(250);
+  flashErrorLEDs(err_leds, 250);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
+
+  // Obtain altimeter data
   sensor.ReadProm();
   sensor.Readout();
   
@@ -81,9 +106,21 @@ void loop() {
   } else if(altitude >= strato_lower and altitude <= strato_upper) {
       tropo.retract();
       strato.extend();
-  } else{
+  } else {  // Retract both arms in non-sampling altitudes
     tropo.retract();
     strato.retract();
+  };
+}
+
+void flashErrorLEDs(int pins[], int seconds) {
+  for(int pin = 0; pin < sizeof(pins); ++pin) {
+    digitalWrite(pin, HIGH);
+  };
+
+  delay(seconds);
+
+  for(int pin = 0; pin < sizeof(pins); ++pin) {
+    digitalWrite(pin, LOW);
   };
 }
 
