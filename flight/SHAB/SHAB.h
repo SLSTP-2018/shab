@@ -26,14 +26,16 @@
 class LinearActuator {
   private:
     bool extended = false;  // Is arm extended
+    bool has_extended = false;  // Has arm ever extended
     int fpin;  // Forward Pin
     int rpin;  // Reverse Pin
     
   public:
     LinearActuator (int f, int r);
     void extend();
-    void retract();
     bool get_extended();
+    void retract();
+    void test();
 };
 
 bool CRC_Valid(MS5xxx& sensor);

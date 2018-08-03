@@ -32,9 +32,10 @@ const int tropo_upper = 12;
 const int strato_lower = 24;
 const int strato_upper = 30;
 
-// Declare global variables for actuators
-extern LinearActuator tropo;
-extern LinearActuator strato;
+// Intitialize LinearActuators
+// Pin Order: fpin, rpin
+LinearActuator tropo (3, 4);
+LinearActuator strato (8, 9);
 
 //Error LED pins
 const int alt_com_err = 10;  // Altimeter Communications Error
@@ -45,11 +46,6 @@ void setup() {
   // put your setup code here, to run once: 
   Serial.begin(9600);
 
-  // Intitialize LinearActuators
-  // Pin Order: fb_pin, fa_pin, rb_pin, ra_pin
-  LinearActuator tropo (3, 4);
-  LinearActuator strato (8, 9);
-
   // Retract arms in case they are extended
   tropo.retract();
   strato.retract();
@@ -58,13 +54,8 @@ void setup() {
   flashErrorLEDs(err_leds, 3000);
 
   // Run actuator tests
-  tropo.extend();
-  delay(1000);
-  tropo.retract();
-  delay(1000);
-  strato.extend();
-  delay(1000);
-  strato.retract();
+  tropo.test();
+  strato.test();
 
   // See if altimeter is responding with CRC
   if(sensor.connect() > 0) {
