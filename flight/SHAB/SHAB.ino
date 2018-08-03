@@ -170,13 +170,3 @@ void flashErrorLEDs(std::array<int, 4>& leds, const int seconds) {
     digitalWrite(leds[led], LOW);
   };
 }
-
-//void powerLinearActuator(boolean useLinAct1, boolean isExtend){
-  // choose which pin to use
-//  int pin = useLinAct1 ? LA_1_EXTEND_PIN : LA_2_EXTEND_PIN;
-  // if isExtend, we already have the correct pin. if retract, it's the next pin
-//  pin = isExtend ? pin : pin + 1;
-  // perform the pin action
-//  digitalWrite(pin, HIGH);
-//  delay(LA_POWER_MILLISECONDS);
-//}
