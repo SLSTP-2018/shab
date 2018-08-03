@@ -63,8 +63,12 @@ void LinearActuator::retract() {
 }
 
 void LinearActuator::self_test() {
-  retract(); // In-case they are extended
+  // In-case they are extended
+  extended = true;
+  retract();
   delay(1000);
+
+  // Extension test
   extend();
   delay(3000);
   retract();
