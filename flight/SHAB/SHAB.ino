@@ -19,10 +19,14 @@
  */
 
 #include <Arduino.h>
-#include "MS5xxx.h"
-#include "SHAB.h"
+#include <SD.h>
+#include <SPI.h>
 #include <SoftwareSerial.h>
 #include <Wire.h>
+
+#include "MS5xxx.h"
+#include "RTClib.h"
+#include "SHAB.h"
 
 MS5xxx sensor(&Wire);
 
