@@ -84,11 +84,10 @@ void setup() {
   digitalWrite(alt_crc_err, LOW);
 
   // Flash Error LEDs to signal end of setup
-  flashErrorLEDs(err_leds, 250);
-  delay(250);
-  flashErrorLEDs(err_leds, 250);
-  delay(250);
-  flashErrorLEDs(err_leds, 250);
+  for(int i = 0; i < 5; ++i) {
+    delay(50);
+    flashErrorLEDs(err_leds, 50);
+  };
 }
 
 void loop() {
@@ -113,13 +112,13 @@ void loop() {
 }
 
 void flashErrorLEDs(int pins[], int seconds) {
-  for(int pin = 0; pin < sizeof(pins); ++pin) {
+  for(int pin = 0; pin < sizeof(int); ++pin) {
     digitalWrite(pin, HIGH);
   };
 
   delay(seconds);
 
-  for(int pin = 0; pin < sizeof(pins); ++pin) {
+  for(int pin = 0; pin < sizeof(int); ++pin) {
     digitalWrite(pin, LOW);
   };
 }
