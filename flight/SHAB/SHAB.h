@@ -31,7 +31,7 @@ class LinearActuator {
     int rpin;  // Reverse Pin
     
   public:
-    LinearActuator (int f, int r);
+    LinearActuator(int f, int r);
     void extend();
     bool get_extended();
     void retract();

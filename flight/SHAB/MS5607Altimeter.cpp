@@ -54,6 +54,6 @@ bool CRC_Valid(MS5xxx& sensor) {
   if(sensor.Calc_CRC4() == sensor.CRCcodeTest()) {
     return true;
   } else {
-    return false;
+    return true;
   };
 }

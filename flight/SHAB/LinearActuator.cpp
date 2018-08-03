@@ -21,10 +21,7 @@
 #include <Arduino.h>
 #include "SHAB.h"
 
-LinearActuator::LinearActuator (int f, int r) {
-  int fpin = f;  // Forward Pin
-  int rpin = r;  // Reverse Pin
-
+LinearActuator::LinearActuator(int f, int r) : fpin(f), rpin(r) {
   pinMode(fpin, OUTPUT);
   pinMode(rpin, OUTPUT);
 }
@@ -34,7 +31,7 @@ void LinearActuator::extend() {
     digitalWrite(fpin, HIGH);
     digitalWrite(rpin, LOW);
 
-    delay(10000);
+    delay(30000);
 
     digitalWrite(fpin, LOW);
     digitalWrite(rpin, LOW);
@@ -45,15 +42,19 @@ void LinearActuator::extend() {
 }
 
 bool LinearActuator::get_extended() {
-  return extended;
+  Serial.println(fpin);
+  Serial.println(rpin);
+  return true;
 }
 
 void LinearActuator::retract() {
   if(extended == true) {
+    Serial.println(fpin);
+    Serial.println(rpin);
     digitalWrite(fpin, LOW);
     digitalWrite(rpin, HIGH);
 
-    delay(10000);
+    delay(30000);
 
     digitalWrite(fpin, LOW);
     digitalWrite(rpin, LOW);
@@ -65,10 +66,14 @@ void LinearActuator::retract() {
 void LinearActuator::self_test() {
   // In-case they are extended
   extended = true;
+  Serial.println(extended);
+  Serial.println(has_extended);
+  Serial.println("Retracting");
   retract();
   delay(1000);
 
   // Extension test
+  Serial.println("Extending");
   extend();
   delay(3000);
   retract();

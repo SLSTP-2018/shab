@@ -19,7 +19,7 @@
  */
 
 #include <Arduino.h>
-#include <SD.h>
+//#include <SD.h>
 #include <SPI.h>
 #include <SoftwareSerial.h>
 #include <Wire.h>
@@ -30,8 +30,8 @@
 
 MS5xxx sensor(&Wire);
 
-RTC_DS1307 RTC;
-const int chipSelect = 4;
+//RTC_DS1307 RTC;
+//const int chipSelect = 4;
 
 // Intitialize LinearActuators
 // Pin Order: fpin, rpin
@@ -39,10 +39,10 @@ LinearActuator tropo (4, 3);
 LinearActuator strato (9, 8);
 
 // Altitude Ranges
-const int tropo_lower = 8;
-const int tropo_upper = 10;
-const int strato_lower = 13;
-const int strato_upper = 16;
+const int tropo_lower = 7;
+const int tropo_upper = 9;
+const int strato_lower = 11;
+const int strato_upper = 13;
 
 //Error LED pins
 const int alt_com_err = 10;  // Altimeter Communications Error
@@ -50,6 +50,7 @@ const int alt_crc_err = 11;  // Altimeter CRC Error
 int err_leds [2] = {alt_com_err, alt_crc_err};  // Array of error LEDs
 
 void setup() {
+  Serial.println(tropo.get_extended());
   Serial.begin(9600);
 
   //Light all error LEDs to ensure function
@@ -82,7 +83,7 @@ void setup() {
 
   // Flash Error LEDs to signal end of setup
   Serial.println("Flashing LEDs");
-  for(int i = 0; i < 5; ++i) {
+  for(int i = 0; i < 15; ++i) {
     delay(50);
     flashErrorLEDs(err_leds, 50);
   };
@@ -96,6 +97,7 @@ void loop() {
   
   Serial.println("Calculating altitude");
   double altitude = PascalToMeter(sensor.GetPres());
+  Serial.println(altitude);
 
   if(altitude >= tropo_lower and altitude <= tropo_upper) {
     Serial.println("Extending tropo");
@@ -117,13 +119,14 @@ void loop() {
 
 void flashErrorLEDs(int pins[], int seconds) {
   for(int pin = 0; pin < sizeof(int); ++pin) {
-    digitalWrite(pin, HIGH);
+    Serial.println(pins[pin]);
+    digitalWrite(pins[pin], HIGH);
   };
 
   delay(seconds);
 
   for(int pin = 0; pin < sizeof(int); ++pin) {
-    digitalWrite(pin, LOW);
+    digitalWrite(pins[pin], LOW);
   };
 }
 
