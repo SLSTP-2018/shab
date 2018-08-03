@@ -37,15 +37,14 @@ int LA_POWER_MILLISECONDS = 5000;
 void setup() {
   // put your setup code here, to run once: 
   Serial.begin(9600);
-  pinMode(10, INPUT);
+  LinearActuator tropo (2, 3, 4, 5);
+  LinearActuator strato (8, 9, 10, 11);
 
-  if(sensor.connect()>0) {
-    digitalWrite(10, HIGH);
+  if(sensor.connect() > 0) {
     Serial.println("Error connecting...");
     delay(500);
     setup();
   }
-  digitalWrite(10, LOW);
 }
 
 void loop() {
