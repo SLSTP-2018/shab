@@ -18,11 +18,51 @@
   along with SHAB.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <Arduino.h>
 #include "SHAB.h"
 
-LinearActuator::LinearActuator (int f, int r){
-  fpin = f;
-  rpin = r;
+LinearActuator::LinearActuator (int f1, int f2, int r1, int r2){
+  fb_pin = f1;  // Forward Before Pin
+  fa_pin = f2;  // Forward After Pin
+  rb_pin = r1;  // Reverse Before Pin
+  ra_pin = r2;  // Reverse After Pin
+
+  pinMode(fb_pin, OUTPUT);
+  pinMode(fa_pin, OUTPUT);
+  pinMode(rb_pin, OUTPUT);
+  pinMode(ra_pin, OUTPUT);
+}
+
+void LinearActuator::extend(){
+  digitalWrite(fb_pin, HIGH);
+  digitalWrite(fa_pin, HIGH);
+  digitalWrite(rb_pin, LOW);
+  digitalWrite(ra_pin, LOW);
+
+  delay(10000);
+
+  digitalWrite(fb_pin, LOW);
+  digitalWrite(fa_pin, LOW);
+  digitalWrite(rb_pin, LOW);
+  digitalWrite(ra_pin, LOW);
+
+  extended = true;
+}
+
+void LinearActuator::retract(){
+  digitalWrite(fb_pin, LOW);
+  digitalWrite(fa_pin, LOW);
+  digitalWrite(rb_pin, HIGH);
+  digitalWrite(ra_pin, HIGH);
+
+  delay(10000);
+
+  digitalWrite(fb_pin, LOW);
+  digitalWrite(fa_pin, LOW);
+  digitalWrite(rb_pin, LOW);
+  digitalWrite(ra_pin, LOW);
+
+  extended = false;
 }
 
 bool LinearActuator::get_extended(){

@@ -56,8 +56,8 @@ void loop() {
   //Serial.println(sensor.GetTemp());
   //Serial.print("Pressure [Pa]: ");
   //Serial.println(sensor.GetPres());
-  //test_crc();
-  Serial.println(PascalToMeter(sensor.GetPres()));
+  test_crc();
+  //Serial.println(PascalToMeter(sensor.GetPres()));
   //Serial.println("---");
   delay(500);
 }

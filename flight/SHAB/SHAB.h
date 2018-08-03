@@ -24,10 +24,15 @@
 class LinearActuator {
   private:
     bool extended = false;
-    int fpin, rpin;
+    int fb_pin;  // Forward Before Pin
+    int fa_pin;  // Forward After Pin
+    int rb_pin;  // Reverse Before Pin
+    int ra_pin;  // Reverse After Pin
     
   public:
-    LinearActuator (int f, int r);
+    LinearActuator (int f1, int f2, int r1, int r2);
+    void extend();
+    void retract();
     bool get_extended();
 };
 
