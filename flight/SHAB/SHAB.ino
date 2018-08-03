@@ -112,6 +112,8 @@ void flashErrorLEDs(int pins[], int seconds) {
   for(int pin = 0; pin < sizeof(int); ++pin) {
     digitalWrite(pin, LOW);
   };
+
+  delay(50);
 }
 
 //void powerLinearActuator(boolean useLinAct1, boolean isExtend){
