@@ -19,7 +19,8 @@
  */
 
 #include <Arduino.h>
-//#include <SD.h>
+#include <array>
+#include <SD.h>
 #include <SPI.h>
 #include <SoftwareSerial.h>
 #include <Wire.h>
@@ -30,8 +31,8 @@
 
 MS5xxx sensor(&Wire);
 
-//RTC_DS1307 RTC;
-//const int chipSelect = 4;
+RTC_DS1307 RTC;
+const int chipSelect = 11;
 
 // Intitialize LinearActuators
 // Pin Order: fpin, rpin
@@ -45,23 +46,55 @@ const int strato_lower = 11;
 const int strato_upper = 13;
 
 //Error LED pins
-const int alt_com_err = 10;  // Altimeter Communications Error
-const int alt_crc_err = 11;  // Altimeter CRC Error
-int err_leds [2] = {alt_com_err, alt_crc_err};  // Array of error LEDs
+const int alt_com_err = 5;   // Altimeter Communications Error
+const int alt_crc_err = 6;   // Altimeter CRC Error
+const int rtc_run_err = 7;   // RTC Not Running Error
+const int sdc_avl_err = 10;  // SD Card Not Available
+
+// Array of error LEDs
+std::array<int, 4> err_leds = {alt_com_err,
+                               alt_crc_err,
+                               rtc_run_err,
+                               sdc_avl_err}; 
 
 void setup() {
-  Serial.println(tropo.get_extended());
   Serial.begin(9600);
+  Wire.begin();
+  RTC.begin();
+
+  for(const int &led : err_leds) {
+    pinMode(err_leds[led], OUTPUT);
+  };
+
+  if (! RTC.isrunning()) {
+    Serial.println("RTC is NOT running!");
+    digitalWrite(rtc_run_err, HIGH);
+  };
+
+  Serial.println(SD.begin(chipSelect));
+
+  if (SD.begin(chipSelect)) {
+    Serial.println("Card failed, or not present");
+    for(int i = 0; i < 15; ++i) {
+      delay(1000);
+      flashErrorLEDs(err_leds, 1000);
+    };
+  }
+
+  RTC.adjust(DateTime(__DATE__, __TIME__));
+
+  DateTime now = RTC.now();
+  Serial.println(now.unixtime());
 
   //Light all error LEDs to ensure function
-  Serial.println("Flashing LEDs");
+  //Serial.println("Flashing LEDs");
   flashErrorLEDs(err_leds, 3000);
 
   // Run actuator tests
-  Serial.println("Running tropo test");
-  tropo.self_test();
-  Serial.println("Running strato test");
-  strato.self_test();
+  //Serial.println("Running tropo test");
+  //tropo.self_test();
+  //Serial.println("Running strato test");
+  //strato.self_test();
 
   // See if altimeter is responding with CRC
   if(sensor.connect() > 0) {
@@ -77,12 +110,13 @@ void setup() {
   }
 
   // Turn off error LEDs
-  Serial.println("Turning off LEDs");
-  digitalWrite(alt_com_err, LOW);
-  digitalWrite(alt_crc_err, LOW);
+  //Serial.println("Turning off LEDs");
+  for(const int &led : err_leds) {
+    digitalWrite(err_leds[led], LOW);
+  };
 
   // Flash Error LEDs to signal end of setup
-  Serial.println("Flashing LEDs");
+  //Serial.println("Flashing LEDs");
   for(int i = 0; i < 15; ++i) {
     delay(50);
     flashErrorLEDs(err_leds, 50);
@@ -90,43 +124,50 @@ void setup() {
 }
 
 void loop() {
+  DateTime now = RTC.now();
+  uint32_t seconds = now.unixtime();
+  File dataFile = SD.open("datalog.txt", FILE_WRITE);
+  dataFile.println(seconds);
+  dataFile.close();
+  //Serial.println(seconds);
+  //Serial.println(now.unixtime());
+
   // Obtain altimeter data
-  Serial.println("Getting altimeter data");
+  //Serial.println("Getting altimeter data");
   sensor.ReadProm();
   sensor.Readout();
   
-  Serial.println("Calculating altitude");
+  //Serial.println("Calculating altitude");
   double altitude = PascalToMeter(sensor.GetPres());
-  Serial.println(altitude);
+  //Serial.println(altitude);
 
   if(altitude >= tropo_lower and altitude <= tropo_upper) {
-    Serial.println("Extending tropo");
+    //Serial.println("Extending tropo");
     tropo.extend();
     strato.retract();
   } else if(altitude >= strato_lower and altitude <= strato_upper) {
-    Serial.println("Extending strato");
+    //Serial.println("Extending strato");
     tropo.retract();
     strato.extend();
   } else {  // Retract both arms in non-sampling altitudes
-    Serial.println("Retracting both");
+    //Serial.println("Retracting both");
     tropo.retract();
     strato.retract();
   };
 
-  Serial.println("End loop");
-  delay(50);
+  //Serial.println("End loop");
+  delay(1000);
 }
 
-void flashErrorLEDs(int pins[], int seconds) {
-  for(int pin = 0; pin < sizeof(int); ++pin) {
-    Serial.println(pins[pin]);
-    digitalWrite(pins[pin], HIGH);
+void flashErrorLEDs(std::array<int, 4>& leds, const int seconds) {
+  for(const int &led : leds) {
+    digitalWrite(leds[led], HIGH);
   };
 
   delay(seconds);
 
-  for(int pin = 0; pin < sizeof(int); ++pin) {
-    digitalWrite(pins[pin], LOW);
+  for(const int &led : leds) {
+    digitalWrite(leds[led], LOW);
   };
 }
 

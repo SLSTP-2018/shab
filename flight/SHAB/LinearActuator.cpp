@@ -42,15 +42,13 @@ void LinearActuator::extend() {
 }
 
 bool LinearActuator::get_extended() {
-  Serial.println(fpin);
-  Serial.println(rpin);
-  return true;
+  return extended;
 }
 
 void LinearActuator::retract() {
   if(extended == true) {
-    Serial.println(fpin);
-    Serial.println(rpin);
+    //Serial.println(fpin);
+    //Serial.println(rpin);
     digitalWrite(fpin, LOW);
     digitalWrite(rpin, HIGH);
 
@@ -66,14 +64,14 @@ void LinearActuator::retract() {
 void LinearActuator::self_test() {
   // In-case they are extended
   extended = true;
-  Serial.println(extended);
-  Serial.println(has_extended);
-  Serial.println("Retracting");
+  //Serial.println(extended);
+  //Serial.println(has_extended);
+  //Serial.println("Retracting");
   retract();
   delay(1000);
 
   // Extension test
-  Serial.println("Extending");
+  //Serial.println("Extending");
   extend();
   delay(3000);
   retract();
