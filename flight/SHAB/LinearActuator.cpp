@@ -22,10 +22,10 @@
 #include "SHAB.h"
 
 LinearActuator::LinearActuator (int f1, int f2, int r1, int r2){
-  fb_pin = f1;  // Forward Before Pin
-  fa_pin = f2;  // Forward After Pin
-  rb_pin = r1;  // Reverse Before Pin
-  ra_pin = r2;  // Reverse After Pin
+  int fb_pin = f1;  // Forward Before Pin
+  int fa_pin = f2;  // Forward After Pin
+  int rb_pin = r1;  // Reverse Before Pin
+  int ra_pin = r2;  // Reverse After Pin
 
   pinMode(fb_pin, OUTPUT);
   pinMode(fa_pin, OUTPUT);

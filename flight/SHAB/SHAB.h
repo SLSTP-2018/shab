@@ -36,6 +36,8 @@ class LinearActuator {
     bool get_extended();
 };
 
+bool CRC_Valid(MS5xxx& sensor);
+
 double PascalToMeter(double  pressurePa);
 
 #endif // SHAB_SHAB_H_

@@ -19,6 +19,7 @@
  */
 
 #include <Arduino.h>
+#include "MS5xxx.h"
 #include "SHAB.h"
 
 double PascalToMeter(double pressurePa) {
@@ -47,4 +48,12 @@ double PascalToMeter(double pressurePa) {
       }
       
       return height;
+}
+
+bool CRC_Valid(MS5xxx& sensor) {
+  if(sensor.Calc_CRC4() == sensor.CRCcodeTest()) {
+    return true;
+  } else {
+    return false;
+  };
 }

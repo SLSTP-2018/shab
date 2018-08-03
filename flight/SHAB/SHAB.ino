@@ -25,23 +25,34 @@
 
 MS5xxx sensor(&Wire);
 
-// the pins must be next to each other for the powerLinearActuator to work
-int LA_1_EXTEND_PIN = 2;
-int LA_1_RETRACT_PIN = 3;
-int LA_2_EXTEND_PIN = 4;
-int LA_2_RETRACT_PIN = 5;
-
-// time to power the linear actuator to fully perform its extend or retract action
-int LA_POWER_MILLISECONDS = 5000;
-
 void setup() {
   // put your setup code here, to run once: 
   Serial.begin(9600);
+
+  // Intitialize LinearActuators
   LinearActuator tropo (2, 3, 4, 5);
   LinearActuator strato (8, 9, 10, 11);
 
+  // Retract arms in case they are extended
+  tropo.retract();
+  strato.retract();
+
+  // Run actuator tests
+  tropo.extend();
+  delay(1000);
+  tropo.retract();
+  delay(1000);
+  strato.extend();
+  delay(1000);
+  strato.retract();
+
+  // See if altimeter is responding with CRC
   if(sensor.connect() > 0) {
     Serial.println("Error connecting...");
+    delay(500);
+    setup();
+  } else if(CRC_Valid(sensor) == false) {
+    Serial.println("CRC failure...");
     delay(500);
     setup();
   }
@@ -51,27 +62,7 @@ void loop() {
   // put your main code here, to run repeatedly:
   sensor.ReadProm();
   sensor.Readout();
-  //Serial.print("Temperature [0.01 C]: ");
-  //Serial.println(sensor.GetTemp());
-  //Serial.print("Pressure [Pa]: ");
-  //Serial.println(sensor.GetPres());
-  //test_crc();
-  //Serial.println(PascalToMeter(sensor.GetPres()));
-  //Serial.println("---");
-  delay(500);
-}
-
-void test_crc() {
-  sensor.ReadProm();
-  sensor.Readout(); 
-  Serial.print("CRC=0x");
-  Serial.print(sensor.Calc_CRC4(), HEX);
-  Serial.print(" (should be 0x");
-  Serial.print(sensor.Read_CRC4(), HEX);
-  Serial.print(")\n");
-  Serial.print("Test Code CRC=0x");
-  Serial.print(sensor.CRCcodeTest(), HEX);
-  Serial.println(" (should be 0xB)");
+  int altitude = PascalToMeter(sensor.GetPres());
 }
 
 void powerLinearActuator(boolean useLinAct1, boolean isExtend){
