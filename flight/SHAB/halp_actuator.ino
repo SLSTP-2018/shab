@@ -10,11 +10,11 @@ void setup() {
   }
 }
 
-void loop() {
-  digitalWrite(motor_left[0], HIGH); 
-  digitalWrite(motor_left[1], LOW); 
-  digitalWrite(motor_right[0], HIGH); 
-  digitalWrite(motor_right[1], LOW); 
+void loop() {  // left = out and right = in
+  digitalWrite(motor_left[0], HIGH); // 5 on
+  digitalWrite(motor_left[1], LOW);  // 6 off
+  digitalWrite(motor_right[0], HIGH);// 4 on
+  digitalWrite(motor_right[1], LOW); // 3 off
   delay(30000);
 
   digitalWrite(motor_left[0], LOW); 

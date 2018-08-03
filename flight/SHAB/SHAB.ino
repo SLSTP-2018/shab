@@ -37,7 +37,7 @@ int LA_POWER_MILLISECONDS = 5000;
 void setup() {
   // put your setup code here, to run once: 
   Serial.begin(9600);
-  pinMode(10, OUTPUT);
+  pinMode(10, INPUT);
 
   if(sensor.connect()>0) {
     digitalWrite(10, HIGH);
