@@ -86,7 +86,7 @@ void LinearActuator::update() {
     extended = true;
     has_extended = true;
     is_extending = false;
-  } else if(is_retracting == true and now - extension_start >= 30){
+  } else if(is_retracting == true and now - retraction_start >= 30){
     digitalWrite(fpin, LOW);
     digitalWrite(rpin, LOW);
 
