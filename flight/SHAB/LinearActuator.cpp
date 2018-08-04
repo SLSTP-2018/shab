@@ -28,12 +28,6 @@ LinearActuator::LinearActuator(int f, int r, RTC_DS1307 RTC)
                                : fpin(f), rpin(r), rtc(RTC) {
   pinMode(fpin, OUTPUT);
   pinMode(rpin, OUTPUT);
-
-  // Assume arm is out and retract it to know current position
-  //extended = true;
-  //retract();
-  //delay(31000);
-  //update();
 }
 
 // Extend the linear actuator.
@@ -75,23 +69,26 @@ void LinearActuator::retract() {
 
 void LinearActuator::self_test() {
   // In case actuator is extended
-  if(extended == true) {
-    retract();
-    delay(31000);
-    update();
-  };
+  extended = true;
+  retract();
+  delay(31000);
+  extended = false;
+  is_retracting = false;
 
   // Extension test
   extend();
   delay(31000);
-  update();
+  extended = true;
+  has_extended = true;
+  is_extending = false;
 
   delay(1000);
 
   // Retraction test
   retract();
   delay(31000);
-  update();
+  extended = false;
+  is_retracting = false;
 
   // Reset the extension switch
   has_extended = false;

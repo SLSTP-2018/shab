@@ -37,8 +37,8 @@ const uint8_t cs = 4;  // Chip Select for SD Card
 
 // Intitialize Hardware Interfaces
 MS5xxx sensor(&Wire);               // Altimeter
-LinearActuator tropo (2, 3, RTC);   // Linear Actuator for Troposphere
-LinearActuator strato (9, 8, RTC);  // Linear Actuator for Stratosphere
+LinearActuator tropo (3, 2, RTC);   // Linear Actuator for Troposphere
+LinearActuator strato (8, 9, RTC);  // Linear Actuator for Stratosphere
 
 // Altitude Sample Ranges (meters)
 const uint16_t tropo_lower  = 3000;
@@ -48,7 +48,6 @@ const uint16_t strato_upper = 15500;
 
 void setup() {
   // Intialize declared hardware interfaces
-  Serial.begin(9600);
   Wire.begin();
   RTC.begin();
 
@@ -71,56 +70,41 @@ void setup() {
   };
 
   // Turn LEDs on for three seconds to ensure they function
-  Serial.println("Performing LED test...");
   flashErrorLEDs(err_leds, num_err_leds, 3000, 1);
-  Serial.println("Completed LED test.");
 
   // Ensure RTC is operating
-  Serial.println("Connecting to RTC...");
   while(!RTC.isrunning()) {  // Stall execution until RTC is running
-    Serial.println("RTC_RUN_ERR");
     digitalWrite(rtc_run_err, HIGH);  // Warn if RTC is not running
   };
-  Serial.println("RTC is functional.");
   RTC.adjust(DateTime(__DATE__, __TIME__));  // Set time to compile time
 
   // Connect with SD card and ensure the connection is valid
-  Serial.println("Connecting to SD card...");
   pinMode(cs, OUTPUT);
   digitalWrite(cs, HIGH);
   while(!SD.begin(cs)) {  // Stall execution until SD card is available
-    Serial.println("SDC_AVL_ERR");
     digitalWrite(sdc_avl_err, HIGH);  // Warn if SD card is not available
   };
-  Serial.println("SD card is functional.");
 
   // Write column header to file
-  Serial.println("Writing column heard to hardware_data.csv.");
-  File dataFile = SD.open("hardware_data.csv", FILE_WRITE);
-  dataFile.println("Time(s),Altitude(m),Pressure(Pa),Temperature(C),Tropo_Extended,Strato_Extended,CRC(0xB)");
+  File dataFile = SD.open("datalog.txt", FILE_WRITE);
+  dataFile.println("Time(s),Altitude(m),Pressure(Pa),Temperature(C),Tropo_Extended,Strato_Extended,CRC(11)");
   dataFile.close();
 
   // Ensure altimeter is connected on I2C
-  Serial.println("Connecting to altimeter...");
   while(sensor.connect() > 0) {  // Stall execution til altimeter is connected
-    Serial.println("ALT_COM_ERR");
     digitalWrite(alt_com_err, HIGH);  // Warn if altimeter not connected
   };
-  Serial.println("Altimeter is functional.");
   
   // Assert Cyclic Redundancy Check of altimeter
-  Serial.println("Performing altimeter CRC...");
   while(!CRC_Valid(sensor)) {  // Stall execution until CRC completes
-    Serial.println("ALT_CRC_ERR");
     digitalWrite(alt_crc_err, HIGH);  // Warn if CRC failure
   };
-  Serial.println("Altimeter passed CRC.");
 
   // Run linear actuator self tests
-  //Serial.println("Performing troposphere actuator self-test");
-  //tropo.self_test();
-  //Serial.println("Performing stratosphere actuator self-test");
-  //strato.self_test();
+  flashErrorLEDs(err_leds, num_err_leds, 333, 3);
+  tropo.self_test();
+  flashErrorLEDs(err_leds, num_err_leds, 333, 4);
+  strato.self_test();
 
   // Turn off all error LEDs
   for(uint8_t pin = 0; pin < num_err_leds; ++pin) {
@@ -128,22 +112,20 @@ void setup() {
   };
 
   // Flash Error LEDs for three seconds to signal end of setup
-  Serial.println("Setup compelete.");
   flashErrorLEDs(err_leds, num_err_leds, 50, 30);
 }
 
 void loop() {
-  Serial.println("Loop Start");
   // Get time at the start of the loop
   uint32_t seconds = RTC.now().unixtime();
 
   // Obtain altimeter data
   sensor.ReadProm();
   sensor.Readout();
-  uint16_t altitude = PascalToMeter(sensor.GetPres());
+  double altitude = PascalToMeter(sensor.GetPres());
 
   // Write data for time point to file
-  File dataFile = SD.open("hardware_data.csv", FILE_WRITE);
+  File dataFile = SD.open("datalog.txt", FILE_WRITE);
   if(dataFile) {
     dataFile.print(seconds);
     dataFile.print(",");
@@ -182,7 +164,7 @@ void loop() {
 }
 
 void flashErrorLEDs(uint8_t pins[], const uint8_t pin_number,
-                    const uint8_t msecs, const uint8_t loop_num) {
+                    const uint16_t msecs, const uint8_t loop_num) {
   for(uint8_t i = 0; i < loop_num; ++i) {
     for(uint8_t pin = 0; pin < pin_number; ++pin) {
       digitalWrite(pins[pin], HIGH);
@@ -193,5 +175,7 @@ void flashErrorLEDs(uint8_t pins[], const uint8_t pin_number,
     for(uint8_t pin = 0; pin < pin_number; ++pin) {
       digitalWrite(pins[pin], LOW);
     };
+
+    delay(msecs);
   };
 }
