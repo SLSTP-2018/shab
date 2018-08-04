@@ -49,7 +49,6 @@ const int strato_upper = 15500;
 void setup() {
 
   // Intialize declared hardware interfaces
-  Serial.begin(9600);
   Wire.begin();
   RTC.begin();
 
@@ -128,12 +127,26 @@ void loop() {
   sensor.Readout();
   double altitude = PascalToMeter(sensor.GetPres());
 
-  // Compile data for output
+  // Write data for time point to file
+  File dataFile = SD.open("hardware_data.csv", FILE_WRITE);
+  if(dataFile) {
+    dataFile.print(seconds);
+    dataFile.print(",");
+    dataFile.print(altitude);
+    dataFile.print(",");
+    dataFile.print(sensor.GetPres());
+    dataFile.print(",");
+    dataFile.print(sensor.GetTemp());
+    dataFile.print(",");
+    dataFile.print(tropo.get_extended());
+    dataFile.print(",");
+    dataFile.print(strato.get_extended());
+    dataFile.print(",");
+    dataFile.println(sensor.CRCcodeTest());
+    dataFile.close();
+  };
 
-  File dataFile = SD.open("datalog.txt", FILE_WRITE);
-  dataFile.println(seconds);
-  dataFile.close();
-
+  // Determine if in a sampling range and extend/retract actuators accordingly
   if(altitude >= tropo_lower and altitude <= tropo_upper) {
     tropo.extend();
     strato.retract();
@@ -145,7 +158,7 @@ void loop() {
     strato.retract();
   };
 
-  //Serial.println("End loop");
+  // One second delay to save power and to keep each row of output unique
   delay(1000);
 }
 
