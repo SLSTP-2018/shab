@@ -88,7 +88,7 @@ void setup() {
   };
 
   // Write column header to file
-  File dataFile = SD.open("datalog.txt", FILE_WRITE);
+  File dataFile = SD.open("hardware_data.csv", FILE_WRITE);
   dataFile.println("Time(s),Altitude(m),Pressure(Pa),Temperature(C),Tropo_Extended,Strato_Extended,CRC(0xB)");
   dataFile.close();
 
