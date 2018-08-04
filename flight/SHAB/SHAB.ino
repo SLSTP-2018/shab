@@ -87,6 +87,11 @@ void setup() {
     digitalWrite(sdc_avl_err, HIGH);  // Warn if SD card is not available
   };
 
+  // Write column header to file
+  File dataFile = SD.open("datalog.txt", FILE_WRITE);
+  dataFile.println("Time(s),Altitude(m),Pressure(Pa),Temperature(C),Tropo_Extended,Strato_Extended,CRC(0xB)");
+  dataFile.close();
+
   // Ensure altimeter is connected on I2C
   while(sensor.connect() > 0) {  // Stall execution til altimeter is connected
     digitalWrite(alt_com_err, HIGH);  // Warn if altimeter not connected
@@ -97,7 +102,7 @@ void setup() {
     digitalWrite(alt_crc_err, HIGH);  // Warn if CRC failure
   };
 
-  // Run actuator self tests
+  // Run linear actuator self tests
   //tropo.self_test();
   //strato.self_test();
 
@@ -106,23 +111,28 @@ void setup() {
     digitalWrite(err_leds[pin], LOW);
   };
 
-  // Flash Error LEDs to signal end of setup
-  for(int i = 0; i < 25; ++i) {
+  // Flash Error LEDs for three seconds to signal end of setup
+  for(int i = 0; i < 30; ++i) {
     delay(50);
     flashErrorLEDs(err_leds, num_err_leds, 50);
   };
 }
 
 void loop() {
+
+  // Get time at the start of the loop
   uint32_t seconds = RTC.now().unixtime();
-  File dataFile = SD.open("datalog.txt", FILE_WRITE);
-  dataFile.println(seconds);
-  dataFile.close();
 
   // Obtain altimeter data
   sensor.ReadProm();
   sensor.Readout();
   double altitude = PascalToMeter(sensor.GetPres());
+
+  // Compile data for output
+
+  File dataFile = SD.open("datalog.txt", FILE_WRITE);
+  dataFile.println(seconds);
+  dataFile.close();
 
   if(altitude >= tropo_lower and altitude <= tropo_upper) {
     tropo.extend();
