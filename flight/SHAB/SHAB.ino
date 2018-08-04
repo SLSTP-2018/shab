@@ -18,106 +18,96 @@
   along with SHAB.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+
+// Built-In Libraries
 #include <Arduino.h>
 #include <SD.h>
 #include <SPI.h>
 #include <SoftwareSerial.h>
 #include <Wire.h>
 
+// Local Libraries
 #include "MS5xxx.h"
 #include "RTClib.h"
 #include "SHAB.h"
 
-MS5xxx sensor(&Wire);
+// Declare Future Hardware Interfaces
+RTC_DS1307 RTC;    // Real-Time Clock
+const int cs = 4;  // Chip Select for SD Card
 
-RTC_DS1307 RTC;
-const int cs = 4;
+// Intitialize Hardware Interfaces
+MS5xxx sensor(&Wire);               // Altimeter
+LinearActuator tropo (2, 3, RTC);   // Linear Actuator for Troposphere
+LinearActuator strato (9, 8, RTC);  // Linear Actuator for Stratosphere
 
-// Intitialize LinearActuators
-// Pin Order: fpin, rpin
-LinearActuator tropo (2, 3, RTC);
-LinearActuator strato (9, 8, RTC);
-
-// Altitude Ranges
-const int tropo_lower = 7;
-const int tropo_upper = 9;
-const int strato_lower = 11;
-const int strato_upper = 13;
-
-//Error LED pins
-const int alt_com_err = 5;   // Altimeter Communications Error
-const int alt_crc_err = 6;   // Altimeter CRC Error
-const int rtc_run_err = 7;   // RTC Not Running Error
-const int sdc_avl_err = 4;  // SD Card Not Available
-
-// Array of error LEDs
-const int num_err_leds = 4;
-int err_leds [num_err_leds] = {alt_com_err,
-                               alt_crc_err,
-                               rtc_run_err,
-                               sdc_avl_err};
+// Altitude Sample Ranges (meters)
+const int tropo_lower  = 3000;
+const int tropo_upper  = 3500;
+const int strato_lower = 15000;
+const int strato_upper = 15500;
 
 void setup() {
+
+  // Intialize declared hardware interfaces
   Serial.begin(9600);
   Wire.begin();
   RTC.begin();
 
+  //Error LED pins
+  const int alt_com_err = 5;   // Altimeter Communications Error
+  const int alt_crc_err = 6;   // Altimeter CRC Error
+  const int rtc_run_err = 7;   // RTC Not Running Error
+  const int sdc_avl_err = 4;  // SD Card Not Available
+
+  // Array of error LEDs
+  const int num_err_leds = 4;
+  int err_leds [num_err_leds] = {alt_com_err,
+                                 alt_crc_err,
+                                 rtc_run_err,
+                                 sdc_avl_err};
+
+  // Enable error LED pins
   for(int pin = 0; pin < num_err_leds; ++pin) {
     pinMode(err_leds[pin], OUTPUT);
   };
 
-  //Light all error LEDs to ensure function
-  Serial.println("Flashing LEDs");
+  // Turn LEDs on for three seconds to ensure they function
   flashErrorLEDs(err_leds, num_err_leds, 3000);
 
-  if (!RTC.isrunning()) {
-    Serial.println("RTC is NOT running!");
-    digitalWrite(rtc_run_err, HIGH);
+  // Ensure RTC is operating
+  while(!RTC.isrunning()) {  // Stall execution until RTC is running
+    digitalWrite(rtc_run_err, HIGH);  // Warn if RTC is not running
   };
+  RTC.adjust(DateTime(__DATE__, __TIME__));  // Set time to compile time
 
+  // Connect with SD card and ensure the connection is valid
   pinMode(cs, OUTPUT);
   digitalWrite(cs, HIGH);
+  while(!SD.begin(cs)) {  // Stall execution until SD card is available
+    digitalWrite(sdc_avl_err, HIGH);  // Warn if SD card is not available
+  };
 
-  if (!SD.begin(cs)) {
-    Serial.println("Card failed, or not present");
-    digitalWrite(sdc_avl_err, HIGH);
-    setup();
-  }
+  // Ensure altimeter is connected on I2C
+  while(sensor.connect() > 0) {  // Stall execution til altimeter is connected
+    digitalWrite(alt_com_err, HIGH);  // Warn if altimeter not connected
+  };
+  
+  // Assert Cyclic Redundancy Check of altimeter
+  while(!CRC_Valid(sensor)) {  // Stall execution until CRC completes
+    digitalWrite(alt_crc_err, HIGH);  // Warn if CRC failure
+  };
 
-  RTC.adjust(DateTime(__DATE__, __TIME__));
-
-  DateTime now = RTC.now();
-
-  // Run actuator tests
-  //Serial.println("Running tropo test");
+  // Run actuator self tests
   //tropo.self_test();
-  //Serial.println("Running strato test");
   //strato.self_test();
 
-  // See if altimeter is responding with CRC
-  if(sensor.connect() > 0) {
-    digitalWrite(alt_com_err, HIGH);
-    Serial.println("Error connecting...");
-    delay(500);
-    setup();
-  }
-  
-  if(CRC_Valid(sensor) == false) {
-    digitalWrite(alt_crc_err, HIGH);
-    Serial.println("CRC failure...");
-    delay(500);
-    setup();
-  }
-
-  // Turn off error LEDs
-  //Serial.println("Turning off LEDs");
+  // Turn off all error LEDs
   for(int pin = 0; pin < num_err_leds; ++pin) {
     digitalWrite(err_leds[pin], LOW);
   };
 
   // Flash Error LEDs to signal end of setup
-  //Serial.println("Flashing LEDs");
-  for(int i = 0; i < 15; ++i) {
+  for(int i = 0; i < 25; ++i) {
     delay(50);
     flashErrorLEDs(err_leds, num_err_leds, 50);
   };
@@ -128,27 +118,19 @@ void loop() {
   File dataFile = SD.open("datalog.txt", FILE_WRITE);
   dataFile.println(seconds);
   dataFile.close();
-  Serial.println(seconds);
 
   // Obtain altimeter data
-  //Serial.println("Getting altimeter data");
   sensor.ReadProm();
   sensor.Readout();
-  
-  //Serial.println("Calculating altitude");
   double altitude = PascalToMeter(sensor.GetPres());
-  //Serial.println(altitude);
 
   if(altitude >= tropo_lower and altitude <= tropo_upper) {
-    //Serial.println("Extending tropo");
     tropo.extend();
     strato.retract();
   } else if(altitude >= strato_lower and altitude <= strato_upper) {
-    //Serial.println("Extending strato");
     tropo.retract();
     strato.extend();
   } else {  // Retract both arms in non-sampling altitudes
-    //Serial.println("Retracting both");
     tropo.retract();
     strato.retract();
   };
