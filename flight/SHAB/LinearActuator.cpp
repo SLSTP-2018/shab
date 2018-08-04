@@ -77,7 +77,7 @@ void LinearActuator::self_test() {
 
   // Extension test
   extend();
-  delay(31000);
+  delay(21000);
   extended = true;
   has_extended = true;
   is_extending = false;
@@ -97,7 +97,7 @@ void LinearActuator::self_test() {
 void LinearActuator::update() {
   int32_t now = rtc.now().unixtime();
 
-  if(is_extending == true and now - extension_start >= 30) {
+  if(is_extending == true and now - extension_start >= 21) {
     digitalWrite(fpin, LOW);
     digitalWrite(rpin, LOW);
     
