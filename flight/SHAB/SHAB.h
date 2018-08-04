@@ -44,6 +44,7 @@ class LinearActuator {
     bool get_extended();
     void retract();
     void self_test();
+    void update();
 };
 
 bool CRC_Valid(MS5xxx& sensor);

@@ -32,14 +32,7 @@ void LinearActuator::extend() {
   if(has_extended == true or extended == true) {
     // pass
   } else if(is_extending == true) {
-    if(rtc.now().unixtime() - extension_start  >= 30) {
-      digitalWrite(fpin, LOW);
-      digitalWrite(rpin, LOW);
-
-      extended = true;
-      has_extended = true;
-      is_extending = false;
-    };
+    update();
   } else {  // Actuator is retracted and has never been extended
     digitalWrite(fpin, HIGH);
     digitalWrite(rpin, LOW);
@@ -60,14 +53,9 @@ void LinearActuator::retract() {
 
     retraction_start = rtc.now().unixtime();
     is_retracting = true;
-  } else if(is_retracting == true) {
-    if(rtc.now().unixtime() - retraction_start  >= 30) {
-      digitalWrite(fpin, LOW);
-      digitalWrite(rpin, LOW);
 
-      extended = false;
-      is_retracting = false;
-    };
+  } else if(is_retracting == true) {
+    update();
   };
 }
 
@@ -76,14 +64,33 @@ void LinearActuator::self_test() {
   extended = true;
   retract();
   delay(31000);
-  retract();
+  update();
 
   // Extension test
   extend();
   delay(31000);
-  extend();
+  update();
   retract();
   delay(31000);
-  retract();
+  update();
   has_extended = false;
+}
+
+void LinearActuator::update() {
+  int32_t now = rtc.now().unixtime();
+
+  if(is_extending == true and now - extension_start >= 30) {
+    digitalWrite(fpin, LOW);
+    digitalWrite(rpin, LOW);
+    
+    extended = true;
+    has_extended = true;
+    is_extending = false;
+  } else if(is_retracting == true and now - extension_start >= 30){
+    digitalWrite(fpin, LOW);
+    digitalWrite(rpin, LOW);
+
+    extended = false;
+    is_retracting = false;
+  };
 }

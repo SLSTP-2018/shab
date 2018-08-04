@@ -153,6 +153,10 @@ void loop() {
     strato.retract();
   };
 
+  // Update position of linear actuators
+  tropo.update();
+  strato.update();
+
   // One second delay to save power and to keep each row of output unique
   delay(1000);
 }
