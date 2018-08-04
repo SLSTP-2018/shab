@@ -52,10 +52,11 @@ const int rtc_run_err = 7;   // RTC Not Running Error
 const int sdc_avl_err = 10;  // SD Card Not Available
 
 // Array of error LEDs
-std::array<int, 4> err_leds = {alt_com_err,
+const int num_err_leds = 4;
+int err_leds [num_err_leds] = {alt_com_err,
                                alt_crc_err,
                                rtc_run_err,
-                               sdc_avl_err}; 
+                               sdc_avl_err};
 
 void setup() {
   Serial.begin(9600);
@@ -77,7 +78,7 @@ void setup() {
     Serial.println("Card failed, or not present");
     for(int i = 0; i < 15; ++i) {
       delay(1000);
-      flashErrorLEDs(err_leds, 1000);
+      flashErrorLEDs(err_leds, num_err_leds, 1000);
     };
   }
 
@@ -88,7 +89,7 @@ void setup() {
 
   //Light all error LEDs to ensure function
   //Serial.println("Flashing LEDs");
-  flashErrorLEDs(err_leds, 3000);
+  flashErrorLEDs(err_leds, num_err_leds, 3000);
 
   // Run actuator tests
   //Serial.println("Running tropo test");
@@ -119,13 +120,12 @@ void setup() {
   //Serial.println("Flashing LEDs");
   for(int i = 0; i < 15; ++i) {
     delay(50);
-    flashErrorLEDs(err_leds, 50);
+    flashErrorLEDs(err_leds, num_err_leds, 50);
   };
 }
 
 void loop() {
-  DateTime now = RTC.now();
-  uint32_t seconds = now.unixtime();
+  uint32_t seconds = RTC.now().unixtime();
   File dataFile = SD.open("datalog.txt", FILE_WRITE);
   dataFile.println(seconds);
   dataFile.close();
@@ -159,14 +159,14 @@ void loop() {
   delay(1000);
 }
 
-void flashErrorLEDs(std::array<int, 4>& leds, const int seconds) {
-  for(const int &led : leds) {
-    digitalWrite(leds[led], HIGH);
+void flashErrorLEDs(int pins[], const int pin_number, const int seconds) {
+  for(int pin = 0; pin < pin_number; ++pin) {
+    digitalWrite(pins[pin], HIGH);
   };
 
   delay(seconds);
 
-  for(const int &led : leds) {
-    digitalWrite(leds[led], LOW);
+  for(int pin = 0; pin < pin_number; ++pin) {
+    digitalWrite(pins[pin], LOW);
   };
 }

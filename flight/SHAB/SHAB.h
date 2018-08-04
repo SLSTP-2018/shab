@@ -25,13 +25,19 @@
 
 class LinearActuator {
   private:
-    bool extended = false;  // Is arm extended
-    bool has_extended = false;  // Has arm ever extended
     int fpin;  // Forward Pin
     int rpin;  // Reverse Pin
+    RTC_DS1307 rtc; // Timing device
+
+    bool extended = false;  // Is arm extended
+    bool has_extended = false;  // Has arm ever extended
+    bool is_extending = false; // Is arm currently extending
+    bool is_retracting = false;  // Is arm currently retracting
+    time_t extension_start;  //  Time arm started extending
+    time_t retraction_start;  //  Time arm started retracting
     
   public:
-    LinearActuator(int f, int r);
+    LinearActuator(int f, int r, RTC_DS1307 rtc);
     void extend();
     bool get_extended();
     void retract();

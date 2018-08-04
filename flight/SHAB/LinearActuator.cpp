@@ -19,25 +19,32 @@
  */
 
 #include <Arduino.h>
+#include "RTClib.h"
 #include "SHAB.h"
 
-LinearActuator::LinearActuator(int f, int r) : fpin(f), rpin(r) {
+LinearActuator::LinearActuator(int f, int r, RTC_DS1307 RTC) : fpin(f), rpin(r), rtc(RTC) {
   pinMode(fpin, OUTPUT);
   pinMode(rpin, OUTPUT);
 }
 
 void LinearActuator::extend() {
-  if(extended == false and has_extended == false) {
+  if(has_extended == true or extended == true) {
+    // pass
+  } else if(is_extending == true) {
+    if(extension_start - rtc.now().unixtime()  > 30) {
+      digitalWrite(fpin, LOW);
+      digitalWrite(rpin, LOW);
+
+      extended = true;
+      has_extended = true;
+      is_extending = false;
+    };
+  } else {  // Actuator is retracted and has never been extended
     digitalWrite(fpin, HIGH);
     digitalWrite(rpin, LOW);
 
-    delay(30000);
-
-    digitalWrite(fpin, LOW);
-    digitalWrite(rpin, LOW);
-
-    extended = true;
-    has_extended = true;
+    extension_start = rtc.now().unixtime();
+    is_extending = true;
   };
 }
 
@@ -46,32 +53,30 @@ bool LinearActuator::get_extended() {
 }
 
 void LinearActuator::retract() {
-  if(extended == true) {
-    //Serial.println(fpin);
-    //Serial.println(rpin);
+  if(extended == true and is_retracting == false) {
     digitalWrite(fpin, LOW);
     digitalWrite(rpin, HIGH);
 
-    delay(30000);
+    retraction_start = rtc.now().unixtime();
+    is_retracting = true;
+  } else if(is_retracting == true) {
+    if(retraction_start - rtc.now().unixtime()  > 30) {
+      digitalWrite(fpin, LOW);
+      digitalWrite(rpin, LOW);
 
-    digitalWrite(fpin, LOW);
-    digitalWrite(rpin, LOW);
-
-    extended = false;
+      extended = false;
+      is_retracting = false;
+    };
   };
 }
 
 void LinearActuator::self_test() {
-  // In-case they are extended
+  // In case actuator is extended
   extended = true;
-  //Serial.println(extended);
-  //Serial.println(has_extended);
-  //Serial.println("Retracting");
   retract();
   delay(1000);
 
   // Extension test
-  //Serial.println("Extending");
   extend();
   delay(3000);
   retract();
