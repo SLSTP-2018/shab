@@ -22,7 +22,8 @@
 #include "RTClib.h"
 #include "SHAB.h"
 
-LinearActuator::LinearActuator(int f, int r, RTC_DS1307 RTC) : fpin(f), rpin(r), rtc(RTC) {
+LinearActuator::LinearActuator(int f, int r, RTC_DS1307 RTC)
+                               : fpin(f), rpin(r), rtc(RTC) {
   pinMode(fpin, OUTPUT);
   pinMode(rpin, OUTPUT);
 }

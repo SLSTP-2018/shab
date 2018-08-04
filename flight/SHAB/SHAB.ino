@@ -22,8 +22,8 @@
 // Built-In Libraries
 #include <Arduino.h>
 #include <SD.h>
-#include <SPI.h>
 #include <SoftwareSerial.h>
+#include <SPI.h>
 #include <Wire.h>
 
 // Local Libraries
@@ -32,8 +32,8 @@
 #include "SHAB.h"
 
 // Declare Future Hardware Interfaces
-RTC_DS1307 RTC;    // Real-Time Clock
-const int cs = 4;  // Chip Select for SD Card
+RTC_DS1307 RTC;        // Real-Time Clock
+const uint8_t cs = 4;  // Chip Select for SD Card
 
 // Intitialize Hardware Interfaces
 MS5xxx sensor(&Wire);               // Altimeter
@@ -41,37 +41,36 @@ LinearActuator tropo (2, 3, RTC);   // Linear Actuator for Troposphere
 LinearActuator strato (9, 8, RTC);  // Linear Actuator for Stratosphere
 
 // Altitude Sample Ranges (meters)
-const int tropo_lower  = 3000;
-const int tropo_upper  = 3500;
-const int strato_lower = 15000;
-const int strato_upper = 15500;
+const uint16_t tropo_lower  = 3000;
+const uint16_t tropo_upper  = 3500;
+const uint16_t strato_lower = 15000;
+const uint16_t strato_upper = 15500;
 
 void setup() {
-
   // Intialize declared hardware interfaces
   Wire.begin();
   RTC.begin();
 
   //Error LED pins
-  const int alt_com_err = 5;   // Altimeter Communications Error
-  const int alt_crc_err = 6;   // Altimeter CRC Error
-  const int rtc_run_err = 7;   // RTC Not Running Error
-  const int sdc_avl_err = 4;  // SD Card Not Available
+  const uint8_t alt_com_err = 5;   // Altimeter Communications Error (Red)
+  const uint8_t alt_crc_err = 6;   // Altimeter CRC Error (Yellow)
+  const uint8_t rtc_run_err = 7;   // RTC Not Running Error (Blue)
+  const uint8_t sdc_avl_err = 10;  // SD Card Not Available (Green)
 
   // Array of error LEDs
-  const int num_err_leds = 4;
-  int err_leds [num_err_leds] = {alt_com_err,
-                                 alt_crc_err,
-                                 rtc_run_err,
-                                 sdc_avl_err};
+  const uint8_t num_err_leds = 4;
+  uint8_t err_leds [num_err_leds] = {alt_com_err,
+                                     alt_crc_err,
+                                     rtc_run_err,
+                                     sdc_avl_err};
 
   // Enable error LED pins
-  for(int pin = 0; pin < num_err_leds; ++pin) {
+  for(uint8_t pin = 0; pin < num_err_leds; ++pin) {
     pinMode(err_leds[pin], OUTPUT);
   };
 
   // Turn LEDs on for three seconds to ensure they function
-  flashErrorLEDs(err_leds, num_err_leds, 3000);
+  flashErrorLEDs(err_leds, num_err_leds, 3000, 1);
 
   // Ensure RTC is operating
   while(!RTC.isrunning()) {  // Stall execution until RTC is running
@@ -106,26 +105,22 @@ void setup() {
   //strato.self_test();
 
   // Turn off all error LEDs
-  for(int pin = 0; pin < num_err_leds; ++pin) {
+  for(uint8_t pin = 0; pin < num_err_leds; ++pin) {
     digitalWrite(err_leds[pin], LOW);
   };
 
   // Flash Error LEDs for three seconds to signal end of setup
-  for(int i = 0; i < 30; ++i) {
-    delay(50);
-    flashErrorLEDs(err_leds, num_err_leds, 50);
-  };
+  flashErrorLEDs(err_leds, num_err_leds, 50, 30);
 }
 
 void loop() {
-
   // Get time at the start of the loop
   uint32_t seconds = RTC.now().unixtime();
 
   // Obtain altimeter data
   sensor.ReadProm();
   sensor.Readout();
-  double altitude = PascalToMeter(sensor.GetPres());
+  uint16_t altitude = PascalToMeter(sensor.GetPres());
 
   // Write data for time point to file
   File dataFile = SD.open("hardware_data.csv", FILE_WRITE);
@@ -162,14 +157,17 @@ void loop() {
   delay(1000);
 }
 
-void flashErrorLEDs(int pins[], const int pin_number, const int msecs) {
-  for(int pin = 0; pin < pin_number; ++pin) {
-    digitalWrite(pins[pin], HIGH);
-  };
+void flashErrorLEDs(uint8_t pins[], const uint8_t pin_number,
+                    const uint8_t msecs, const uint8_t loop_num) {
+  for(uint8_t i = 0; i < loop_num; ++i) {
+    for(uint8_t pin = 0; pin < pin_number; ++pin) {
+      digitalWrite(pins[pin], HIGH);
+    };
 
-  delay(msecs);
+    delay(msecs);
 
-  for(int pin = 0; pin < pin_number; ++pin) {
-    digitalWrite(pins[pin], LOW);
+    for(uint8_t pin = 0; pin < pin_number; ++pin) {
+      digitalWrite(pins[pin], LOW);
+    };
   };
 }

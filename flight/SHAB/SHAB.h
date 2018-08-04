@@ -26,17 +26,17 @@
 #include "RTClib.h"
 
 class LinearActuator {
-  public:
-    int fpin;  // Forward Pin
-    int rpin;  // Reverse Pin
-    RTC_DS1307 rtc; // Timing device
+  private:
+    uint8_t fpin;    // Forward Pin
+    uint8_t rpin;    // Reverse Pin
+    RTC_DS1307 rtc;  // Timing device
 
-    bool extended = false;  // Is arm extended
-    bool has_extended = false;  // Has arm ever extended
-    bool is_extending = false; // Is arm currently extending
+    bool extended = false;       // Is arm extended
+    bool has_extended = false;   // Has arm ever extended
+    bool is_extending = false;   // Is arm currently extending
     bool is_retracting = false;  // Is arm currently retracting
-    uint32_t extension_start;  //  Time arm started extending
-    uint32_t retraction_start;  //  Time arm started retracting
+    uint32_t extension_start;    // Time arm started extending
+    uint32_t retraction_start;   // Time arm started retracting
     
   public:
     LinearActuator(int f, int r, RTC_DS1307 rtc);
