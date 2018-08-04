@@ -19,7 +19,6 @@
  */
 
 #include <Arduino.h>
-#include <array>
 #include <SD.h>
 #include <SPI.h>
 #include <SoftwareSerial.h>
@@ -32,12 +31,12 @@
 MS5xxx sensor(&Wire);
 
 RTC_DS1307 RTC;
-const int chipSelect = 11;
+const int cs = 4;
 
 // Intitialize LinearActuators
 // Pin Order: fpin, rpin
-LinearActuator tropo (4, 3);
-LinearActuator strato (9, 8);
+LinearActuator tropo (2, 3, RTC);
+LinearActuator strato (9, 8, RTC);
 
 // Altitude Ranges
 const int tropo_lower = 7;
@@ -49,7 +48,7 @@ const int strato_upper = 13;
 const int alt_com_err = 5;   // Altimeter Communications Error
 const int alt_crc_err = 6;   // Altimeter CRC Error
 const int rtc_run_err = 7;   // RTC Not Running Error
-const int sdc_avl_err = 10;  // SD Card Not Available
+const int sdc_avl_err = 4;  // SD Card Not Available
 
 // Array of error LEDs
 const int num_err_leds = 4;
@@ -63,33 +62,31 @@ void setup() {
   Wire.begin();
   RTC.begin();
 
-  for(const int &led : err_leds) {
-    pinMode(err_leds[led], OUTPUT);
+  for(int pin = 0; pin < num_err_leds; ++pin) {
+    pinMode(err_leds[pin], OUTPUT);
   };
 
-  if (! RTC.isrunning()) {
+  //Light all error LEDs to ensure function
+  Serial.println("Flashing LEDs");
+  flashErrorLEDs(err_leds, num_err_leds, 3000);
+
+  if (!RTC.isrunning()) {
     Serial.println("RTC is NOT running!");
     digitalWrite(rtc_run_err, HIGH);
   };
 
-  Serial.println(SD.begin(chipSelect));
+  pinMode(cs, OUTPUT);
+  digitalWrite(cs, HIGH);
 
-  if (SD.begin(chipSelect)) {
+  if (!SD.begin(cs)) {
     Serial.println("Card failed, or not present");
-    for(int i = 0; i < 15; ++i) {
-      delay(1000);
-      flashErrorLEDs(err_leds, num_err_leds, 1000);
-    };
+    digitalWrite(sdc_avl_err, HIGH);
+    setup();
   }
 
   RTC.adjust(DateTime(__DATE__, __TIME__));
 
   DateTime now = RTC.now();
-  Serial.println(now.unixtime());
-
-  //Light all error LEDs to ensure function
-  //Serial.println("Flashing LEDs");
-  flashErrorLEDs(err_leds, num_err_leds, 3000);
 
   // Run actuator tests
   //Serial.println("Running tropo test");
@@ -103,7 +100,9 @@ void setup() {
     Serial.println("Error connecting...");
     delay(500);
     setup();
-  } else if(CRC_Valid(sensor) == false) {
+  }
+  
+  if(CRC_Valid(sensor) == false) {
     digitalWrite(alt_crc_err, HIGH);
     Serial.println("CRC failure...");
     delay(500);
@@ -112,8 +111,8 @@ void setup() {
 
   // Turn off error LEDs
   //Serial.println("Turning off LEDs");
-  for(const int &led : err_leds) {
-    digitalWrite(err_leds[led], LOW);
+  for(int pin = 0; pin < num_err_leds; ++pin) {
+    digitalWrite(err_leds[pin], LOW);
   };
 
   // Flash Error LEDs to signal end of setup
@@ -129,8 +128,7 @@ void loop() {
   File dataFile = SD.open("datalog.txt", FILE_WRITE);
   dataFile.println(seconds);
   dataFile.close();
-  //Serial.println(seconds);
-  //Serial.println(now.unixtime());
+  Serial.println(seconds);
 
   // Obtain altimeter data
   //Serial.println("Getting altimeter data");
@@ -159,12 +157,12 @@ void loop() {
   delay(1000);
 }
 
-void flashErrorLEDs(int pins[], const int pin_number, const int seconds) {
+void flashErrorLEDs(int pins[], const int pin_number, const int msecs) {
   for(int pin = 0; pin < pin_number; ++pin) {
     digitalWrite(pins[pin], HIGH);
   };
 
-  delay(seconds);
+  delay(msecs);
 
   for(int pin = 0; pin < pin_number; ++pin) {
     digitalWrite(pins[pin], LOW);

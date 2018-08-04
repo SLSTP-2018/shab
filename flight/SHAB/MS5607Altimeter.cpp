@@ -51,9 +51,9 @@ double PascalToMeter(double pressurePa) {
 }
 
 bool CRC_Valid(MS5xxx& sensor) {
-  if(sensor.Calc_CRC4() == sensor.CRCcodeTest()) {
+  if(sensor.CRCcodeTest() == 0xB) {
     return true;
   } else {
-    return true;
+    return false;
   };
 }

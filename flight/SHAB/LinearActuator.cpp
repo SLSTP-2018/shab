@@ -31,7 +31,7 @@ void LinearActuator::extend() {
   if(has_extended == true or extended == true) {
     // pass
   } else if(is_extending == true) {
-    if(extension_start - rtc.now().unixtime()  > 30) {
+    if(rtc.now().unixtime() - extension_start  >= 30) {
       digitalWrite(fpin, LOW);
       digitalWrite(rpin, LOW);
 
@@ -60,7 +60,7 @@ void LinearActuator::retract() {
     retraction_start = rtc.now().unixtime();
     is_retracting = true;
   } else if(is_retracting == true) {
-    if(retraction_start - rtc.now().unixtime()  > 30) {
+    if(rtc.now().unixtime() - retraction_start  >= 30) {
       digitalWrite(fpin, LOW);
       digitalWrite(rpin, LOW);
 
@@ -74,11 +74,15 @@ void LinearActuator::self_test() {
   // In case actuator is extended
   extended = true;
   retract();
-  delay(1000);
+  delay(31000);
+  retract();
 
   // Extension test
   extend();
-  delay(3000);
+  delay(31000);
+  extend();
+  retract();
+  delay(31000);
   retract();
   has_extended = false;
 }
