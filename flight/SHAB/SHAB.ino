@@ -48,6 +48,7 @@ const uint16_t strato_upper = 15500;
 
 void setup() {
   // Intialize declared hardware interfaces
+  Serial.begin(9600);
   Wire.begin();
   RTC.begin();
 
@@ -70,38 +71,55 @@ void setup() {
   };
 
   // Turn LEDs on for three seconds to ensure they function
+  Serial.println("Performing LED test...");
   flashErrorLEDs(err_leds, num_err_leds, 3000, 1);
+  Serial.println("Completed LED test.");
 
   // Ensure RTC is operating
+  Serial.println("Connecting to RTC...");
   while(!RTC.isrunning()) {  // Stall execution until RTC is running
+    Serial.println("RTC_RUN_ERR");
     digitalWrite(rtc_run_err, HIGH);  // Warn if RTC is not running
   };
+  Serial.println("RTC is functional.");
   RTC.adjust(DateTime(__DATE__, __TIME__));  // Set time to compile time
 
   // Connect with SD card and ensure the connection is valid
+  Serial.println("Connecting to SD card...");
   pinMode(cs, OUTPUT);
   digitalWrite(cs, HIGH);
   while(!SD.begin(cs)) {  // Stall execution until SD card is available
+    Serial.println("SDC_AVL_ERR");
     digitalWrite(sdc_avl_err, HIGH);  // Warn if SD card is not available
   };
+  Serial.println("SD card is functional.");
 
   // Write column header to file
+  Serial.println("Writing column heard to hardware_data.csv.");
   File dataFile = SD.open("hardware_data.csv", FILE_WRITE);
   dataFile.println("Time(s),Altitude(m),Pressure(Pa),Temperature(C),Tropo_Extended,Strato_Extended,CRC(0xB)");
   dataFile.close();
 
   // Ensure altimeter is connected on I2C
+  Serial.println("Connecting to altimeter...");
   while(sensor.connect() > 0) {  // Stall execution til altimeter is connected
+    Serial.println("ALT_COM_ERR");
     digitalWrite(alt_com_err, HIGH);  // Warn if altimeter not connected
   };
+  Serial.println("Altimeter is functional.");
   
   // Assert Cyclic Redundancy Check of altimeter
+  Serial.println("Performing altimeter CRC...");
   while(!CRC_Valid(sensor)) {  // Stall execution until CRC completes
+    Serial.println("ALT_CRC_ERR");
     digitalWrite(alt_crc_err, HIGH);  // Warn if CRC failure
   };
+  Serial.println("Altimeter passed CRC.");
 
   // Run linear actuator self tests
+  //Serial.println("Performing troposphere actuator self-test");
   //tropo.self_test();
+  //Serial.println("Performing stratosphere actuator self-test");
   //strato.self_test();
 
   // Turn off all error LEDs
@@ -110,10 +128,12 @@ void setup() {
   };
 
   // Flash Error LEDs for three seconds to signal end of setup
+  Serial.println("Setup compelete.");
   flashErrorLEDs(err_leds, num_err_leds, 50, 30);
 }
 
 void loop() {
+  Serial.println("Loop Start");
   // Get time at the start of the loop
   uint32_t seconds = RTC.now().unixtime();
 

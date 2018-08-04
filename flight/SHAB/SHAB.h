@@ -18,6 +18,7 @@
   along with SHAB.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+// Multiple-Inclusion Guard
 #ifndef SHAB_SHAB_H_
 #define SHAB_SHAB_H_
 
@@ -37,7 +38,8 @@
 // As a result, this class must assume all operations work and use variables
 // to record the last known position/operation. Importantly, this means the
 // class takes 30 seconds to initialize as it attempts to retract the actuator
-// to guarantee the arm's starting position.
+// to guarantee the arm's starting position. Finally, this class only permits
+// extending the actuator once for use with high-altitude balloon sampling.
 class LinearActuator {
   private:
     // Initialized members
@@ -60,7 +62,7 @@ class LinearActuator {
     void retract();       // Retracts the linear actuator
     void self_test();     // Performs 90 second self-test
 
-    // Updates the state of the lienar actuator during movement. This function
+    // Updates the state of the linear actuator during movement. This function
     // is used internally by extend() and retract(), but is also meant to be
     // called directly. This function should be called at the end of each loop.
     void update();

@@ -22,24 +22,35 @@
 #include "RTClib.h"
 #include "SHAB.h"
 
+// Construct LinearActuator class by turning on forward and reverse pins,
+// acquiring an RTC, and retracting the actuator.
 LinearActuator::LinearActuator(int f, int r, RTC_DS1307 RTC)
                                : fpin(f), rpin(r), rtc(RTC) {
   pinMode(fpin, OUTPUT);
   pinMode(rpin, OUTPUT);
-  extended = true;
-  retract();
-  delay(30000);
+
+  // Assume arm is out and retract it to know current position
+  //extended = true;
+  //retract();
+  //delay(31000);
+  //update();
 }
 
+// Extend the linear actuator.
+// This function will refuse to extend the arm if the actuator has ever been,
+// or currently is, extended. If the actuator is currently extending, it will
+// update the position of the arm.
 void LinearActuator::extend() {
   if(has_extended == true or extended == true) {
     // pass
   } else if(is_extending == true) {
     update();
   } else {  // Actuator is retracted and has never been extended
+    // Physically extend actuator
     digitalWrite(fpin, HIGH);
     digitalWrite(rpin, LOW);
 
+    // Record time of extension and flag that actuator is moving
     extension_start = rtc.now().unixtime();
     is_extending = true;
   };
@@ -64,18 +75,25 @@ void LinearActuator::retract() {
 
 void LinearActuator::self_test() {
   // In case actuator is extended
-  extended = true;
-  retract();
-  delay(31000);
-  update();
+  if(extended == true) {
+    retract();
+    delay(31000);
+    update();
+  };
 
   // Extension test
   extend();
   delay(31000);
   update();
+
+  delay(1000);
+
+  // Retraction test
   retract();
   delay(31000);
   update();
+
+  // Reset the extension switch
   has_extended = false;
 }
 
