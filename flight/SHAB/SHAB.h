@@ -25,12 +25,27 @@
 #include "MS5xxx.h"
 #include "RTClib.h"
 
+
+// Controls a L12-100-210-6-S Actuonix linear actuator.
+// The three member variables in the constructor are:
+//   fpin: pin that extends the linear actuator when powered
+//   rpin: pin that retracts the linear actuator when powered
+//   rtc:  Real-Time Clock for timing the actuator
+// This model of actuator does not report any information to the Arduino about
+// it's position. This class determines the position of the linear actuator
+// based on the known extension and retraction time of the actuator (~26s).
+// As a result, this class must assume all operations work and use variables
+// to record the last known position/operation. Importantly, this means the
+// class takes 30 seconds to initialize as it attempts to retract the actuator
+// to guarantee the arm's starting position.
 class LinearActuator {
   private:
-    uint8_t fpin;    // Forward Pin
-    uint8_t rpin;    // Reverse Pin
-    RTC_DS1307 rtc;  // Timing device
+    // Initialized members
+    uint8_t fpin;    // Forward Pin: Extends linear actuator
+    uint8_t rpin;    // Reverse Pin: Restracts linear actuator
+    RTC_DS1307 rtc;  // Real-Time Clock device
 
+    // Private variables for tracking the linear actuator's physical behavior
     bool extended = false;       // Is arm extended
     bool has_extended = false;   // Has arm ever extended
     bool is_extending = false;   // Is arm currently extending
@@ -40,15 +55,22 @@ class LinearActuator {
     
   public:
     LinearActuator(int f, int r, RTC_DS1307 rtc);
-    void extend();
-    bool get_extended();
-    void retract();
-    void self_test();
+    void extend();        // Extends the linear actuator
+    bool get_extended();  // Returns the extension state of linear actuator
+    void retract();       // Retracts the linear actuator
+    void self_test();     // Performs 90 second self-test
+
+    // Updates the state of the lienar actuator during movement. This function
+    // is used internally by extend() and retract(), but is also meant to be
+    // called directly. This function should be called at the end of each loop.
     void update();
 };
 
+// Performs a Cyclic Redundancy Check on the MS5xxx altimeter module and
+// ensures the result is equal to a pre-determined value.
 bool CRC_Valid(MS5xxx& sensor);
 
+// Converts temperature-corrected pressure in pascals to altitude in meters.
 double PascalToMeter(double  pressurePa);
 
 #endif // SHAB_SHAB_H_

@@ -26,6 +26,9 @@ LinearActuator::LinearActuator(int f, int r, RTC_DS1307 RTC)
                                : fpin(f), rpin(r), rtc(RTC) {
   pinMode(fpin, OUTPUT);
   pinMode(rpin, OUTPUT);
+  extended = true;
+  retract();
+  delay(30000);
 }
 
 void LinearActuator::extend() {
