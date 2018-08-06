@@ -69,7 +69,7 @@ void setup() {
     pinMode(err_leds[pin], OUTPUT);
   };
 
-  // Turn LEDs on for three seconds to ensure they function
+  // Turn on LEDs for three seconds to ensure they function
   flashErrorLEDs(err_leds, num_err_leds, 3000, 1);
 
   // Ensure RTC is operating
@@ -163,9 +163,12 @@ void loop() {
   delay(1000);
 }
 
+// Flash an array of LEDs for a set time.
 void flashErrorLEDs(uint8_t pins[], const uint8_t pin_number,
                     const uint16_t msecs, const uint8_t loop_num) {
   for(uint8_t i = 0; i < loop_num; ++i) {
+
+    // Turn LEDs on
     for(uint8_t pin = 0; pin < pin_number; ++pin) {
       digitalWrite(pins[pin], HIGH);
     };

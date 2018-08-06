@@ -22,8 +22,7 @@
 #include "RTClib.h"
 #include "SHAB.h"
 
-// Construct LinearActuator class by turning on forward and reverse pins,
-// acquiring an RTC, and retracting the actuator.
+// Construct LinearActuator class by turning on forward and reverse pins.
 LinearActuator::LinearActuator(int f, int r, RTC_DS1307 RTC)
                                : fpin(f), rpin(r), rtc(RTC) {
   pinMode(fpin, OUTPUT);
@@ -54,11 +53,17 @@ bool LinearActuator::get_extended() {
   return extended;
 }
 
+// Retract the linear actuator.
+// This function will refuse to retract the arm unless the actuator is
+// extended. If the actuator is currently extending, it will update the
+// position of the arm.
 void LinearActuator::retract() {
   if(extended == true and is_retracting == false) {
+    // Physically retract actuator
     digitalWrite(fpin, LOW);
     digitalWrite(rpin, HIGH);
 
+    // Record time of retraction and flag that actuator is moving
     retraction_start = rtc.now().unixtime();
     is_retracting = true;
 
@@ -68,7 +73,7 @@ void LinearActuator::retract() {
 }
 
 void LinearActuator::self_test() {
-  // In case actuator is extended
+  // Fully retract the actuator.
   extended = true;
   retract();
   delay(31000);

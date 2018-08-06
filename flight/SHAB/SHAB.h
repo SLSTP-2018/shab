@@ -36,9 +36,7 @@
 // it's position. This class determines the position of the linear actuator
 // based on the known extension and retraction time of the actuator (~26s).
 // As a result, this class must assume all operations work and use variables
-// to record the last known position/operation. Importantly, this means the
-// class takes 30 seconds to initialize as it attempts to retract the actuator
-// to guarantee the arm's starting position. Finally, this class only permits
+// to record the last known position/operation. This class only permits
 // extending the actuator once for use with high-altitude balloon sampling.
 class LinearActuator {
   private:
