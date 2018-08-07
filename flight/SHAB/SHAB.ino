@@ -27,9 +27,9 @@
 #include <Wire.h>
 
 // Local Libraries
-#include "MS5xxx.h"
-#include "RTClib.h"
-#include "SHAB.h"
+#include "MS5xxx.h"  // Altimeter
+#include "RTClib.h"  // Real-Time Clock
+#include "SHAB.h"    // In-house code
 
 // Declare Future Hardware Interfaces
 RTC_DS1307 RTC;        // Real-Time Clock
@@ -42,9 +42,9 @@ LinearActuator strato (8, 9, RTC);  // Linear Actuator for Stratosphere
 
 // Altitude Sample Ranges (meters)
 const uint16_t tropo_lower  = 3000;
-const uint16_t tropo_upper  = 3500;
+const uint16_t tropo_upper  = 4000;
 const uint16_t strato_lower = 15000;
-const uint16_t strato_upper = 15500;
+const uint16_t strato_upper = 16000;
 
 void setup() {
   // Intialize declared hardware interfaces
