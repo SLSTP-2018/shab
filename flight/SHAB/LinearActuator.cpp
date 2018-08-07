@@ -72,6 +72,10 @@ void LinearActuator::retract() {
   };
 }
 
+// Runs a full self-test on the linear actuator.
+// This function first retracts the linear reactor in case it is extended,
+// then it extends and retracts the linear actuator. Finally, it resets the
+// the variables to ensure the actuator functions in the future.
 void LinearActuator::self_test() {
   // Fully retract the actuator.
   extended = true;
@@ -99,20 +103,29 @@ void LinearActuator::self_test() {
   has_extended = false;
 }
 
+// Updates LinearActuator's internal tracking variables for a moving arm.
+// Briefly, this functions determines if enough time has passed for an
+// extending or retracting arm to have fully extended or retracted. It then
+// turns off the actuator if needed and updates tracking variables.
 void LinearActuator::update() {
   int32_t now = rtc.now().unixtime();
 
+  // Determines if actuator has been extending/retracting for long enough
   if(is_extending == true and now - extension_start >= 21) {
+    // Stop actuator
     digitalWrite(fpin, LOW);
     digitalWrite(rpin, LOW);
     
+    // Update tracking variables
     extended = true;
     has_extended = true;
     is_extending = false;
   } else if(is_retracting == true and now - retraction_start >= 30){
+    // Stop actuator
     digitalWrite(fpin, LOW);
     digitalWrite(rpin, LOW);
 
+    // Update tracking variables
     extended = false;
     is_retracting = false;
   };
