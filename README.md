@@ -74,3 +74,22 @@ Our software performs the following protocol:
        extend troposphere arm. Otherwise, retract it.
     6. If within stratosphere sample range (15000-16000 metres),
        extend stratosphere arm. Otherwise, retract it.
+
+## Important Caveats
+
+The L12-100-210-6-S Actuonix linear actuators we used do not report their
+current position to the Arduino, nor do they report any data whatsoever.
+These actuator simply extend upon receiving a 5V current and retract upon
+receiving a -5V current. We would recommend using a different actuator
+controller (the "-S" in the product code), but should you choose to use this
+same model, be aware of some oddities in the code. The Arduio only estimates
+whether or not the actuator is extended based on how long the actuators take
+to extend and retract (~26 seconds under no load). Our actuator extends for
+23 seconds to prevent it from fallign off the rails of our specific setup.
+You may need to adjust this number for your needs.
+
+Furthermore, and *very importantly*, the Arduino will write that the
+actuators were extended during the sampling altitudes regardless of actual
+deployment since it simply cannot know if deployment was successful. Thus,
+other means--such as camera--should be used to confirm linear actuator
+deployment.
