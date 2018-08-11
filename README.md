@@ -1,5 +1,7 @@
 # shab
-SLSTP 2018 High Altitude Balloon Project
+
+This repo contains all the hardware specifications, software, manuals, etc. for
+the SLSTP 2018 High Altitude Balloon group project.
 
 ## Directory Structure
 
