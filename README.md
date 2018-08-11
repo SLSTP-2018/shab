@@ -31,7 +31,7 @@ Our code performs the following algorithm:
     * Real-Time Clock (RTC)
     * Error LEDs
 2. Perform an initial self-test:
-    1. Turn on all LEDs for three second to ensure function
+    1. Turn on all LEDs for three seconds to ensure function
     2. Test for RTC response
         * Light <span style="color:blue">**blue**</span> LED on failure
     3. Test for SD card availability
