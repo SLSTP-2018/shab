@@ -18,8 +18,7 @@ navigation:
 ## Flight Software
 
 The code for our Arduino is completely contained within the [SHAB](flight/SHAB)
-folder. The [build](flight/build) folder contains a pre-compiled build of
-[SHAB](flight/SHAB) for reducing build verification time by Visual Studio Code.
+folder.
 
 Our software performs the following protocol:
 
