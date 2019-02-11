@@ -8,7 +8,6 @@ the SLSTP 2018 High Altitude Balloon group project.
 This list briefly summarizes the purpose of each folder in this repo to ease
 navigation:
 
-* 16S: Code and workflows for analyzing 16S data
 * Black Carbon Telelmetry: Code relating to combining our various data streams
                            and analyzing ABCD data
 * Flight: Code related to performing the flight, e.g. Arduino code
@@ -85,11 +84,11 @@ controller (the "-S" in the product code), but should you choose to use this
 same model, be aware of some oddities in the code. The Arduio only estimates
 whether or not the actuator is extended based on how long the actuators take
 to extend and retract (~26 seconds under no load). Our actuator extends for
-23 seconds to prevent it from fallign off the rails of our specific setup.
+23 seconds to prevent it from falling off the rails of our specific setup.
 You may need to adjust this number for your needs.
 
 Furthermore, and *very importantly*, the Arduino will write that the
 actuators were extended during the sampling altitudes regardless of actual
 deployment since it simply cannot know if deployment was successful. Thus,
-other means--such as camera--should be used to confirm linear actuator
+other means--such as a camera--should be used to confirm linear actuator
 deployment.
