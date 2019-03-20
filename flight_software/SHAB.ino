@@ -175,6 +175,7 @@ void flashErrorLEDs(uint8_t pins[], const uint8_t pin_number,
 
     delay(msecs);
 
+    // Turn LEDs off
     for(uint8_t pin = 0; pin < pin_number; ++pin) {
       digitalWrite(pins[pin], LOW);
     };
