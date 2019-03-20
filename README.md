@@ -10,7 +10,7 @@ navigation:
 
 * Black Carbon Telelmetry: Code relating to combining our various data streams
                            and analyzing ABCD data
-* Flight: Code related to performing the flight, e.g. Arduino code
+* Flight Software: Code related to performing the flight, e.g. Arduino code
 * Hardware: Hardware designs, e.g. CAD files, PCB schematics, etc.
 * Manuals: Operating and software manuals for all parts
 * Reference Code: Any software from previous projects to reference in our work
@@ -91,3 +91,11 @@ actuators were extended during the sampling altitudes regardless of actual
 deployment since it simply cannot know if deployment was successful. Thus,
 other means--such as a camera--should be used to confirm linear actuator
 deployment.
+
+## Licensing
+
+All our own code and CAD designs are licensed as per the GPL V3 License provided
+herein. All manuals, reference_code, and hardware are subject to the copyrights
+of their owners and are provided in this repository for your convenience.
+Additionally, the following libraries are provided under their original
+license: `RTClib`, `MS%xxx`, and `MS5607Altimeter`.
