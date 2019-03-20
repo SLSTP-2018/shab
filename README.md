@@ -1,15 +1,13 @@
 # shab
 
 This repo contains all the hardware specifications, software, manuals, etc. for
-the SLSTP 2018 High Altitude Balloon group project.
+the SLSTP 2018 High Altitude Balloon (SHAB) group project.
 
 ## Directory Structure
 
 This list briefly summarizes the purpose of each folder in this repo to ease
 navigation:
 
-* Black Carbon Telelmetry: Code relating to combining our various data streams
-                           and analyzing ABCD data
 * Flight Software: Code related to performing the flight, e.g. Arduino code
 * Hardware: Hardware designs, e.g. CAD files, PCB schematics, etc.
 * Manuals: Operating and software manuals for all parts
@@ -18,7 +16,8 @@ navigation:
 ## Flight Software
 
 The code for our Arduino is completely contained within the [SHAB](flight_software)
-folder.
+folder. Using an Arduino IDE or Visual Studio, you can compile the folder into
+a single file and upload it to an Arduino in a single step.
 
 Our software performs the following protocol:
 
