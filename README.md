@@ -17,7 +17,7 @@ navigation:
 
 ## Flight Software
 
-The code for our Arduino is completely contained within the [SHAB](flight/SHAB)
+The code for our Arduino is completely contained within the [SHAB](flight_software)
 folder.
 
 Our software performs the following protocol:
